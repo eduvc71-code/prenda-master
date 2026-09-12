@@ -1,40 +1,46 @@
-# Miscellaneous
-*.class
-*.lock
-*.log
-*.pyc
-*.swp
-.DS_Store
-.atom/
-.buildlog/
-.history
-.svn/
-ez_log.txt
-
-# IntelliJ related
-*.iml
-*.ipr
-*.iws
-.idea/
-
-# VS Code related
-.vscode/
-
-# Flutter/Dart/Pub related
-**/doc/api/
+```
+# Flutter/Dart specific
 .dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
-.pub-cache/
-.pub/
-/build/
+.packages
+pubspec.lock
+build/
+*.g.dart
+*.freezed.dart
 
-# Signatures/credentials & local settings
-android/app/key.jks
-android/key.properties
-android/local.properties
-google-services.json
-GoogleService-Info.plist
+# Dependencies
+vendor/
+.packages
 
-# Coverage
-coverage/
+# Logs
+*.log
+**/logs
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary folders
+tmp/
+temp/
+
+# Environment variables
+.env
+.env.local
+.env.*
+!.env.example
+
+# IDE specific
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build outputs
+bin/
+lib/src/generated/
+```
