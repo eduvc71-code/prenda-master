@@ -1,0 +1,1340 @@
+import '/backend/backend.dart';
+import '/components/balance_chip/balance_chip_widget.dart';
+import '/components/button/button_widget.dart';
+import '/components/payment_option/payment_option_widget.dart';
+import '/components/tab_group/tab_group_widget.dart';
+import '/components/text_field/text_field_widget.dart';
+import '/flutter_flow/flutter_flow_drop_down.dart';
+import '/flutter_flow/flutter_flow_icon_button.dart';
+import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/flutter_flow_widgets.dart';
+import '/flutter_flow/form_field_controller.dart';
+import 'dart:ui';
+import '/flutter_flow/custom_functions.dart' as functions;
+import '/index.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+
+import 'payment_transaction_model.dart';
+export 'payment_transaction_model.dart';
+
+class PaymentTransactionWidget extends StatefulWidget {
+  const PaymentTransactionWidget({
+    super.key,
+    this.loanId,
+  });
+
+  final String? loanId;
+
+  static String routeName = 'PaymentTransaction';
+  static String routePath = '/paymentTransaction';
+
+  @override
+  State<PaymentTransactionWidget> createState() =>
+      _PaymentTransactionWidgetState();
+}
+
+class _PaymentTransactionWidgetState extends State<PaymentTransactionWidget> {
+  late PaymentTransactionModel _model;
+
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _model = createModel(context, () => PaymentTransactionModel());
+  }
+
+  @override
+  void dispose() {
+    _model.dispose();
+
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<LoansRecord>(
+      stream: LoansRecord.getDocument('loans/${widget!.loanId}'.ref),
+      builder: (context, snapshot) {
+        // Customize what your widget looks like when it's loading.
+        if (!snapshot.hasData) {
+          return Scaffold(
+            backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+            body: Center(
+              child: SizedBox(
+                width: 50,
+                height: 50,
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          );
+        }
+
+        final paymentTransactionLoansRecord = snapshot.data!;
+
+        return GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+            FocusManager.instance.primaryFocus?.unfocus();
+          },
+          child: Scaffold(
+            key: scaffoldKey,
+            backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+            body: Container(
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Container(
+                    width: 0,
+                    height: 0,
+                  ),
+                  Container(
+                    width: 0,
+                    height: 0,
+                  ),
+                  Container(
+                    width: 0,
+                    height: 0,
+                  ),
+                  Container(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: FlutterFlowTheme.of(context)
+                                .secondaryBackground,
+                            shape: BoxShape.rectangle,
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Padding(
+                                padding: EdgeInsetsDirectional.fromSTEB(
+                                    24, 16, 24, 16),
+                                child: Container(
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          FlutterFlowIconButton(
+                                            borderRadius: 8,
+                                            buttonSize: 40,
+                                            fillColor: Colors.transparent,
+                                            icon: Icon(
+                                              Icons.arrow_back_rounded,
+                                              size: 24,
+                                            ),
+                                            onPressed: () async {
+                                              context.pop();
+                                            },
+                                          ),
+                                          Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Registrar Pago',
+                                                style:
+                                                    FlutterFlowTheme.of(context)
+                                                        .titleLarge
+                                                        .override(
+                                                          font:
+                                                              GoogleFonts.inter(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontStyle:
+                                                                FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .titleLarge
+                                                                    .fontStyle,
+                                                          ),
+                                                          letterSpacing: 0.0,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontStyle:
+                                                              FlutterFlowTheme.of(
+                                                                      context)
+                                                                  .titleLarge
+                                                                  .fontStyle,
+                                                          lineHeight: 1.27,
+                                                        ),
+                                              ),
+                                              StreamBuilder<List<LoansRecord>>(
+                                                stream: queryLoansRecord(),
+                                                builder: (context, snapshot) {
+                                                  // Customize what your widget looks like when it's loading.
+                                                  if (!snapshot.hasData) {
+                                                    return Center(
+                                                      child: SizedBox(
+                                                        width: 50,
+                                                        height: 50,
+                                                        child:
+                                                            CircularProgressIndicator(),
+                                                      ),
+                                                    );
+                                                  }
+                                                  List<LoansRecord>
+                                                      textLoansRecordList =
+                                                      snapshot.data!;
+
+                                                  return Text(
+                                                    getJsonField(
+                                                              functions.currentLoan(
+                                                                  textLoansRecordList
+                                                                      .toList(),
+                                                                  widget!
+                                                                      .loanId!),
+                                                              r'''$.codigo''',
+                                                            ) !=
+                                                            null
+                                                        ? getJsonField(
+                                                            functions.currentLoan(
+                                                                textLoansRecordList
+                                                                    .toList(),
+                                                                widget!
+                                                                    .loanId!),
+                                                            r'''$.codigo''',
+                                                          ).toString()
+                                                        : '--',
+                                                    style: FlutterFlowTheme.of(
+                                                            context)
+                                                        .labelMedium
+                                                        .override(
+                                                          font:
+                                                              GoogleFonts.inter(
+                                                            fontWeight:
+                                                                FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .labelMedium
+                                                                    .fontWeight,
+                                                            fontStyle:
+                                                                FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .labelMedium
+                                                                    .fontStyle,
+                                                          ),
+                                                          color: FlutterFlowTheme
+                                                                  .of(context)
+                                                              .secondaryText,
+                                                          letterSpacing: 0.0,
+                                                          fontWeight:
+                                                              FlutterFlowTheme.of(
+                                                                      context)
+                                                                  .labelMedium
+                                                                  .fontWeight,
+                                                          fontStyle:
+                                                              FlutterFlowTheme.of(
+                                                                      context)
+                                                                  .labelMedium
+                                                                  .fontStyle,
+                                                          lineHeight: 1.38,
+                                                        ),
+                                                  );
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        ].divide(SizedBox(width: 16)),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                height: 1,
+                                decoration: BoxDecoration(
+                                  color: FlutterFlowTheme.of(context).alternate,
+                                  shape: BoxShape.rectangle,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: SingleChildScrollView(
+                            primary: false,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.all(24),
+                                  child: Container(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: [
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            color: FlutterFlowTheme.of(context)
+                                                .secondaryBackground,
+                                            borderRadius:
+                                                BorderRadius.circular(24),
+                                            shape: BoxShape.rectangle,
+                                            border: Border.all(
+                                              color:
+                                                  FlutterFlowTheme.of(context)
+                                                      .alternate,
+                                              width: 1,
+                                            ),
+                                          ),
+                                          child: Padding(
+                                            padding: EdgeInsets.all(24),
+                                            child: StreamBuilder<
+                                                List<LoansRecord>>(
+                                              stream: queryLoansRecord(),
+                                              builder: (context, snapshot) {
+                                                // Customize what your widget looks like when it's loading.
+                                                if (!snapshot.hasData) {
+                                                  return Center(
+                                                    child: SizedBox(
+                                                      width: 50,
+                                                      height: 50,
+                                                      child:
+                                                          CircularProgressIndicator(),
+                                                    ),
+                                                  );
+                                                }
+                                                List<LoansRecord>
+                                                    containerPaddingLoansRecordList =
+                                                    snapshot.data!;
+
+                                                return Container(
+                                                  child: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.max,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        16),
+                                                            child:
+                                                                CachedNetworkImage(
+                                                              fadeInDuration:
+                                                                  Duration(
+                                                                      milliseconds:
+                                                                          0),
+                                                              fadeOutDuration:
+                                                                  Duration(
+                                                                      milliseconds:
+                                                                          0),
+                                                              imageUrl:
+                                                                  'https://dimg.dreamflow.cloud/v1/image/cliente%20carnet',
+                                                              width: 48,
+                                                              height: 48,
+                                                              fit: BoxFit.cover,
+                                                              alignment:
+                                                                  Alignment(
+                                                                      0, 0),
+                                                            ),
+                                                          ),
+                                                          Expanded(
+                                                            flex: 1,
+                                                            child: Column(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .min,
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .start,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                StreamBuilder<
+                                                                    List<
+                                                                        ClientsRecord>>(
+                                                                  stream:
+                                                                      queryClientsRecord(),
+                                                                  builder: (context,
+                                                                      snapshot) {
+                                                                    // Customize what your widget looks like when it's loading.
+                                                                    if (!snapshot
+                                                                        .hasData) {
+                                                                      return Center(
+                                                                        child:
+                                                                            SizedBox(
+                                                                          width:
+                                                                              50,
+                                                                          height:
+                                                                              50,
+                                                                          child:
+                                                                              CircularProgressIndicator(),
+                                                                        ),
+                                                                      );
+                                                                    }
+                                                                    List<ClientsRecord>
+                                                                        textClientsRecordList =
+                                                                        snapshot
+                                                                            .data!;
+
+                                                                    return Text(
+                                                                      getJsonField(
+                                                                                functions.currentClient(textClientsRecordList.toList(), containerPaddingLoansRecordList.toList(), widget!.loanId!),
+                                                                                r'''$.nombre''',
+                                                                              ) !=
+                                                                              null
+                                                                          ? getJsonField(
+                                                                              functions.currentClient(textClientsRecordList.toList(), containerPaddingLoansRecordList.toList(), widget!.loanId!),
+                                                                              r'''$.nombre''',
+                                                                            ).toString()
+                                                                          : 'Cargando...',
+                                                                      style: FlutterFlowTheme.of(
+                                                                              context)
+                                                                          .titleMedium
+                                                                          .override(
+                                                                            font:
+                                                                                GoogleFonts.inter(
+                                                                              fontWeight: FontWeight.bold,
+                                                                              fontStyle: FlutterFlowTheme.of(context).titleMedium.fontStyle,
+                                                                            ),
+                                                                            letterSpacing:
+                                                                                0.0,
+                                                                            fontWeight:
+                                                                                FontWeight.bold,
+                                                                            fontStyle:
+                                                                                FlutterFlowTheme.of(context).titleMedium.fontStyle,
+                                                                            lineHeight:
+                                                                                1.35,
+                                                                          ),
+                                                                    );
+                                                                  },
+                                                                ),
+                                                                Text(
+                                                                  'Garantía: ${getJsonField(
+                                                                        functions.currentLoan(
+                                                                            containerPaddingLoansRecordList.toList(),
+                                                                            widget!.loanId!),
+                                                                        r'''$.descripcion_prenda''',
+                                                                      ) != null ? getJsonField(
+                                                                      functions.currentLoan(
+                                                                          containerPaddingLoansRecordList
+                                                                              .toList(),
+                                                                          widget!
+                                                                              .loanId!),
+                                                                      r'''$.descripcion_prenda''',
+                                                                    ).toString() : 'Prenda'}',
+                                                                  style: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .bodySmall
+                                                                      .override(
+                                                                        font: GoogleFonts
+                                                                            .inter(
+                                                                          fontWeight: FlutterFlowTheme.of(context)
+                                                                              .bodySmall
+                                                                              .fontWeight,
+                                                                          fontStyle: FlutterFlowTheme.of(context)
+                                                                              .bodySmall
+                                                                              .fontStyle,
+                                                                        ),
+                                                                        color: FlutterFlowTheme.of(context)
+                                                                            .secondaryText,
+                                                                        letterSpacing:
+                                                                            0.0,
+                                                                        fontWeight: FlutterFlowTheme.of(context)
+                                                                            .bodySmall
+                                                                            .fontWeight,
+                                                                        fontStyle: FlutterFlowTheme.of(context)
+                                                                            .bodySmall
+                                                                            .fontStyle,
+                                                                        lineHeight:
+                                                                            1.38,
+                                                                      ),
+                                                                ),
+                                                              ].divide(SizedBox(
+                                                                  height: 4)),
+                                                            ),
+                                                          ),
+                                                        ].divide(SizedBox(
+                                                            width: 16)),
+                                                      ),
+                                                      Divider(
+                                                        height: 16,
+                                                        thickness: 1,
+                                                        indent: 0,
+                                                        endIndent: 0,
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .alternate,
+                                                      ),
+                                                      Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.max,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          wrapWithModel(
+                                                            model: _model
+                                                                .balanceChipModel1,
+                                                            updateCallback: () =>
+                                                                safeSetState(
+                                                                    () {}),
+                                                            child:
+                                                                BalanceChipWidget(
+                                                              tone: FlutterFlowTheme
+                                                                      .of(context)
+                                                                  .primary,
+                                                              label:
+                                                                  'Saldo Capital',
+                                                              value: 'Bs. ${getJsonField(
+                                                                    functions.currentLoan(
+                                                                        containerPaddingLoansRecordList
+                                                                            .toList(),
+                                                                        widget!
+                                                                            .loanId!),
+                                                                    r'''$.saldo_capital''',
+                                                                  ) != null ? getJsonField(
+                                                                  functions.currentLoan(
+                                                                      containerPaddingLoansRecordList
+                                                                          .toList(),
+                                                                      widget!
+                                                                          .loanId!),
+                                                                  r'''$.saldo_capital''',
+                                                                ).toString() : '0'}',
+                                                            ),
+                                                          ),
+                                                          wrapWithModel(
+                                                            model: _model
+                                                                .balanceChipModel2,
+                                                            updateCallback: () =>
+                                                                safeSetState(
+                                                                    () {}),
+                                                            child:
+                                                                BalanceChipWidget(
+                                                              tone: FlutterFlowTheme
+                                                                      .of(context)
+                                                                  .error,
+                                                              label:
+                                                                  'Interés/Mora',
+                                                              value: 'Bs. ${getJsonField(
+                                                                    functions.currentLoan(
+                                                                        containerPaddingLoansRecordList
+                                                                            .toList(),
+                                                                        widget!
+                                                                            .loanId!),
+                                                                    r'''$.saldo_interes_mora''',
+                                                                  ) != null ? getJsonField(
+                                                                  functions.currentLoan(
+                                                                      containerPaddingLoansRecordList
+                                                                          .toList(),
+                                                                      widget!
+                                                                          .loanId!),
+                                                                  r'''$.saldo_interes_mora''',
+                                                                ).toString() : '0'}',
+                                                            ),
+                                                          ),
+                                                        ].divide(SizedBox(
+                                                            width: 16)),
+                                                      ),
+                                                    ].divide(
+                                                        SizedBox(height: 16)),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                        Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              'Detalles del Pago',
+                                              style:
+                                                  FlutterFlowTheme.of(context)
+                                                      .titleMedium
+                                                      .override(
+                                                        font: GoogleFonts.inter(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontStyle:
+                                                              FlutterFlowTheme.of(
+                                                                      context)
+                                                                  .titleMedium
+                                                                  .fontStyle,
+                                                        ),
+                                                        letterSpacing: 0.0,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontStyle:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .titleMedium
+                                                                .fontStyle,
+                                                        lineHeight: 1.35,
+                                                      ),
+                                            ),
+                                            wrapWithModel(
+                                              model: _model.tabGroupModel,
+                                              updateCallback: () =>
+                                                  safeSetState(() {}),
+                                              child: TabGroupWidget(
+                                                label2: 'Solo Interés',
+                                                label2Present: true,
+                                                label3: 'Solo Capital',
+                                                label3Present: true,
+                                                label4: '',
+                                                label4Present: false,
+                                                label5: '',
+                                                label5Present: false,
+                                                label1: 'Pago Mixto',
+                                              ),
+                                            ),
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .secondaryBackground,
+                                                borderRadius:
+                                                    BorderRadius.circular(16),
+                                                shape: BoxShape.rectangle,
+                                                border: Border.all(
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .alternate,
+                                                  width: 1,
+                                                ),
+                                              ),
+                                              child: Padding(
+                                                padding: EdgeInsets.all(24),
+                                                child: Container(
+                                                  child: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      wrapWithModel(
+                                                        model: _model
+                                                            .textFieldModel1,
+                                                        updateCallback: () =>
+                                                            safeSetState(() {}),
+                                                        child: TextFieldWidget(
+                                                          label:
+                                                              'Monto a Pagar',
+                                                          labelPresent: true,
+                                                          helper: '',
+                                                          helperPresent: false,
+                                                          leadingIcon: Icon(
+                                                            Icons
+                                                                .payments_rounded,
+                                                            color: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .primaryText,
+                                                            size: 24,
+                                                          ),
+                                                          leadingIconPresent:
+                                                              true,
+                                                          trailingIconPresent:
+                                                              false,
+                                                          hint: '0.00',
+                                                          value: _model.amount
+                                                              ?.toString(),
+                                                          onChange: '',
+                                                          onSubmit: '',
+                                                          variant: 'outlined',
+                                                          error: false,
+                                                        ),
+                                                      ),
+                                                      Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.max,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Expanded(
+                                                            flex: 1,
+                                                            child:
+                                                                wrapWithModel(
+                                                              model: _model
+                                                                  .textFieldModel2,
+                                                              updateCallback: () =>
+                                                                  safeSetState(
+                                                                      () {}),
+                                                              child:
+                                                                  TextFieldWidget(
+                                                                label: 'Fecha',
+                                                                labelPresent:
+                                                                    true,
+                                                                helper: '',
+                                                                helperPresent:
+                                                                    false,
+                                                                leadingIcon:
+                                                                    Icon(
+                                                                  Icons
+                                                                      .calendar_today_rounded,
+                                                                  color: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .primaryText,
+                                                                  size: 24,
+                                                                ),
+                                                                leadingIconPresent:
+                                                                    true,
+                                                                trailingIconPresent:
+                                                                    false,
+                                                                hint:
+                                                                    'Type here...',
+                                                                value:
+                                                                    _model.date,
+                                                                onChange: '',
+                                                                onSubmit: '',
+                                                                variant:
+                                                                    'outlined',
+                                                                error: false,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Expanded(
+                                                            flex: 1,
+                                                            child:
+                                                                FlutterFlowDropDown<
+                                                                    String>(
+                                                              controller: _model
+                                                                      .dropdownValueController ??=
+                                                                  FormFieldController<
+                                                                      String>(
+                                                                _model.dropdownValue ??=
+                                                                    _model
+                                                                        .method,
+                                                              ),
+                                                              options: [
+                                                                'Efectivo',
+                                                                'Transferencia',
+                                                                'QR',
+                                                                'Depósito'
+                                                              ],
+                                                              onChanged: (val) =>
+                                                                  safeSetState(() =>
+                                                                      _model.dropdownValue =
+                                                                          val),
+                                                              width: 200,
+                                                              height: 40,
+                                                              textStyle:
+                                                                  FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .bodyMedium
+                                                                      .override(
+                                                                        font: GoogleFonts
+                                                                            .inter(
+                                                                          fontWeight: FlutterFlowTheme.of(context)
+                                                                              .bodyMedium
+                                                                              .fontWeight,
+                                                                          fontStyle: FlutterFlowTheme.of(context)
+                                                                              .bodyMedium
+                                                                              .fontStyle,
+                                                                        ),
+                                                                        letterSpacing:
+                                                                            0.0,
+                                                                        fontWeight: FlutterFlowTheme.of(context)
+                                                                            .bodyMedium
+                                                                            .fontWeight,
+                                                                        fontStyle: FlutterFlowTheme.of(context)
+                                                                            .bodyMedium
+                                                                            .fontStyle,
+                                                                        lineHeight:
+                                                                            1.47,
+                                                                      ),
+                                                              hintText:
+                                                                  'Efectivo',
+                                                              icon: Icon(
+                                                                Icons
+                                                                    .keyboard_arrow_down_rounded,
+                                                                color: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .secondaryText,
+                                                                size: 24,
+                                                              ),
+                                                              fillColor: FlutterFlowTheme
+                                                                      .of(context)
+                                                                  .secondaryBackground,
+                                                              elevation: 2,
+                                                              borderColor:
+                                                                  FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .alternate,
+                                                              borderWidth: 1,
+                                                              borderRadius: 12,
+                                                              margin:
+                                                                  EdgeInsetsDirectional
+                                                                      .fromSTEB(
+                                                                          16,
+                                                                          0,
+                                                                          16,
+                                                                          0),
+                                                              hidesUnderline:
+                                                                  true,
+                                                              isOverButton:
+                                                                  false,
+                                                              isSearchable:
+                                                                  false,
+                                                              isMultiSelect:
+                                                                  false,
+                                                              labelText:
+                                                                  'Método',
+                                                              labelTextStyle:
+                                                                  FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .labelMedium
+                                                                      .override(
+                                                                        font: GoogleFonts
+                                                                            .inter(
+                                                                          fontWeight: FlutterFlowTheme.of(context)
+                                                                              .labelMedium
+                                                                              .fontWeight,
+                                                                          fontStyle: FlutterFlowTheme.of(context)
+                                                                              .labelMedium
+                                                                              .fontStyle,
+                                                                        ),
+                                                                        letterSpacing:
+                                                                            0.0,
+                                                                        fontWeight: FlutterFlowTheme.of(context)
+                                                                            .labelMedium
+                                                                            .fontWeight,
+                                                                        fontStyle: FlutterFlowTheme.of(context)
+                                                                            .labelMedium
+                                                                            .fontStyle,
+                                                                        lineHeight:
+                                                                            1.38,
+                                                                      ),
+                                                            ),
+                                                          ),
+                                                        ].divide(SizedBox(
+                                                            width: 16)),
+                                                      ),
+                                                      wrapWithModel(
+                                                        model: _model
+                                                            .textFieldModel3,
+                                                        updateCallback: () =>
+                                                            safeSetState(() {}),
+                                                        child: TextFieldWidget(
+                                                          label:
+                                                              'Notas / Observaciones',
+                                                          labelPresent: true,
+                                                          helper: '',
+                                                          helperPresent: false,
+                                                          leadingIconPresent:
+                                                              false,
+                                                          trailingIconPresent:
+                                                              false,
+                                                          hint:
+                                                              'Ej. Pago adelantado del mes de junio',
+                                                          value: _model.notes,
+                                                          onChange: '',
+                                                          onSubmit: '',
+                                                          variant: 'outlined',
+                                                          error: false,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        _model.error!,
+                                                        style:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .bodyMedium
+                                                                .override(
+                                                                  font:
+                                                                      GoogleFonts
+                                                                          .inter(
+                                                                    fontWeight: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontWeight,
+                                                                    fontStyle: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .bodyMedium
+                                                                        .fontStyle,
+                                                                  ),
+                                                                  color: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .error,
+                                                                  letterSpacing:
+                                                                      0.0,
+                                                                  fontWeight: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .bodyMedium
+                                                                      .fontWeight,
+                                                                  fontStyle: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .bodyMedium
+                                                                      .fontStyle,
+                                                                  lineHeight:
+                                                                      1.47,
+                                                                ),
+                                                      ),
+                                                    ].divide(
+                                                        SizedBox(height: 24)),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ].divide(SizedBox(height: 16)),
+                                        ),
+                                        Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              'Confirmar Destino',
+                                              style:
+                                                  FlutterFlowTheme.of(context)
+                                                      .titleMedium
+                                                      .override(
+                                                        font: GoogleFonts.inter(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontStyle:
+                                                              FlutterFlowTheme.of(
+                                                                      context)
+                                                                  .titleMedium
+                                                                  .fontStyle,
+                                                        ),
+                                                        letterSpacing: 0.0,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontStyle:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .titleMedium
+                                                                .fontStyle,
+                                                        lineHeight: 1.35,
+                                                      ),
+                                            ),
+                                            InkWell(
+                                              splashColor: Colors.transparent,
+                                              focusColor: Colors.transparent,
+                                              hoverColor: Colors.transparent,
+                                              highlightColor:
+                                                  Colors.transparent,
+                                              onTap: () async {
+                                                _model.method = 'Efectivo';
+                                                safeSetState(() {});
+                                              },
+                                              child: wrapWithModel(
+                                                model:
+                                                    _model.paymentOptionModel1,
+                                                updateCallback: () =>
+                                                    safeSetState(() {}),
+                                                child: PaymentOptionWidget(
+                                                  selected: _model.method ==
+                                                      'Efectivo',
+                                                  icon: Icon(
+                                                    Icons
+                                                        .account_balance_wallet_rounded,
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .primaryText,
+                                                    size: 20,
+                                                  ),
+                                                  title: 'Caja General',
+                                                  subtitle:
+                                                      'Ingreso inmediato a efectivo',
+                                                ),
+                                              ),
+                                            ),
+                                            InkWell(
+                                              splashColor: Colors.transparent,
+                                              focusColor: Colors.transparent,
+                                              hoverColor: Colors.transparent,
+                                              highlightColor:
+                                                  Colors.transparent,
+                                              onTap: () async {
+                                                _model.method = 'Transferencia';
+                                                safeSetState(() {});
+                                              },
+                                              child: wrapWithModel(
+                                                model:
+                                                    _model.paymentOptionModel2,
+                                                updateCallback: () =>
+                                                    safeSetState(() {}),
+                                                child: PaymentOptionWidget(
+                                                  selected: _model.method ==
+                                                      'Transferencia',
+                                                  icon: Icon(
+                                                    Icons
+                                                        .account_balance_rounded,
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .primaryText,
+                                                    size: 20,
+                                                  ),
+                                                  title: 'Banco Unión',
+                                                  subtitle:
+                                                      'Verificado por transferencia',
+                                                ),
+                                              ),
+                                            ),
+                                          ].divide(SizedBox(height: 16)),
+                                        ),
+                                        Container(
+                                          height: 24,
+                                        ),
+                                        Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            InkWell(
+                                              splashColor: Colors.transparent,
+                                              focusColor: Colors.transparent,
+                                              hoverColor: Colors.transparent,
+                                              highlightColor:
+                                                  Colors.transparent,
+                                              onTap: () async {
+                                                if (_model.amount! <= 0.0) {
+                                                  _model.error =
+                                                      '\"El monto debe ser mayor a cero\"';
+                                                  safeSetState(() {});
+                                                  return;
+                                                }
+                                                if ((loans.by_id(
+                                                        widget!.loanId)) ==
+                                                    null) {
+                                                  return;
+                                                }
+
+                                                await PaymentsRecord.collection
+                                                    .doc()
+                                                    .set(
+                                                        createPaymentsRecordData(
+                                                      prestamoId:
+                                                          'widget!.loanId',
+                                                      monto: _model.amount,
+                                                      tipo: _model.paymentType,
+                                                      fecha: _model.date,
+                                                      metodo: _model.method,
+                                                      notas: _model.notes,
+                                                    ));
+
+                                                await paymentTransactionLoansRecord
+                                                    .reference
+                                                    .update(
+                                                        createLoansRecordData(
+                                                  saldoCapital: (loans.by_id(
+                                                          widget!.loanid))
+                                                      .saldo_capital,
+                                                  saldoInteres: (loans.by_id(
+                                                          widget!.loanid))
+                                                      .saldo_interes,
+                                                  saldoMora: (loans.by_id(
+                                                          widget!.loanid))
+                                                      .saldo_mora,
+                                                  estado: ((loans.by_id(widget!
+                                                                  .loanId))
+                                                              .saldo_capital) <=
+                                                          0
+                                                      ? 'pagado'
+                                                      : 'activo',
+                                                ));
+
+                                                context.goNamed(
+                                                    LoanManagementWidget
+                                                        .routeName);
+                                              },
+                                              child: wrapWithModel(
+                                                model: _model.buttonModel1,
+                                                updateCallback: () =>
+                                                    safeSetState(() {}),
+                                                child: ButtonWidget(
+                                                  icon: Icon(
+                                                    Icons.check_circle_rounded,
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .primaryText,
+                                                    size: 24,
+                                                  ),
+                                                  iconPresent: true,
+                                                  iconEndPresent: false,
+                                                  content:
+                                                      'Confirmar y Generar Recibo',
+                                                  variant: 'primary',
+                                                  size: 'large',
+                                                  fullWidth: true,
+                                                  loading: false,
+                                                  disabled: false,
+                                                ),
+                                              ),
+                                            ),
+                                            InkWell(
+                                              splashColor: Colors.transparent,
+                                              focusColor: Colors.transparent,
+                                              hoverColor: Colors.transparent,
+                                              highlightColor:
+                                                  Colors.transparent,
+                                              onTap: () async {
+                                                context.pop();
+                                              },
+                                              child: wrapWithModel(
+                                                model: _model.buttonModel2,
+                                                updateCallback: () =>
+                                                    safeSetState(() {}),
+                                                child: ButtonWidget(
+                                                  iconPresent: false,
+                                                  iconEndPresent: false,
+                                                  content:
+                                                      'Cancelar Transacción',
+                                                  variant: 'ghost',
+                                                  size: 'medium',
+                                                  fullWidth: true,
+                                                  loading: false,
+                                                  disabled: false,
+                                                ),
+                                              ),
+                                            ),
+                                          ].divide(SizedBox(height: 16)),
+                                        ),
+                                      ].divide(SizedBox(height: 24)),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: FlutterFlowTheme.of(context)
+                                .secondaryBackground,
+                            shape: BoxShape.rectangle,
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Container(
+                                height: 1,
+                                decoration: BoxDecoration(
+                                  color: FlutterFlowTheme.of(context).alternate,
+                                  shape: BoxShape.rectangle,
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.all(24),
+                                child: Container(
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'TOTAL A RECIBIR',
+                                            style: FlutterFlowTheme.of(context)
+                                                .labelSmall
+                                                .override(
+                                                  font: GoogleFonts.inter(
+                                                    fontWeight:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .labelSmall
+                                                            .fontWeight,
+                                                    fontStyle:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .labelSmall
+                                                            .fontStyle,
+                                                  ),
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .secondaryText,
+                                                  letterSpacing: 0.0,
+                                                  fontWeight:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .labelSmall
+                                                          .fontWeight,
+                                                  fontStyle:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .labelSmall
+                                                          .fontStyle,
+                                                  lineHeight: 1.27,
+                                                ),
+                                          ),
+                                          Text(
+                                            'Bs. ${_model.amount?.toString()}',
+                                            style: FlutterFlowTheme.of(context)
+                                                .headlineSmall
+                                                .override(
+                                                  font: GoogleFonts.inter(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontStyle:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .headlineSmall
+                                                            .fontStyle,
+                                                  ),
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .success,
+                                                  letterSpacing: 0.0,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontStyle:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .headlineSmall
+                                                          .fontStyle,
+                                                  lineHeight: 1.3,
+                                                ),
+                                          ),
+                                        ].divide(SizedBox(height: 4)),
+                                      ),
+                                      Container(
+                                        width: 140,
+                                        child: InkWell(
+                                          splashColor: Colors.transparent,
+                                          focusColor: Colors.transparent,
+                                          hoverColor: Colors.transparent,
+                                          highlightColor: Colors.transparent,
+                                          onTap: () async {
+                                            if (_model.amount! <= 0.0) {
+                                              _model.error =
+                                                  '\"El monto debe ser mayor a cero\"';
+                                              safeSetState(() {});
+                                              return;
+                                            }
+                                            if ((loans.by_id(widget!.loanId)) ==
+                                                null) {
+                                              return;
+                                            }
+
+                                            await PaymentsRecord.collection
+                                                .doc()
+                                                .set(createPaymentsRecordData(
+                                                  prestamoId: 'widget!.loanId',
+                                                  monto: _model.amount,
+                                                  tipo: _model.paymentType,
+                                                  fecha: _model.date,
+                                                  metodo: _model.method,
+                                                  notas: _model.notes,
+                                                ));
+
+                                            await paymentTransactionLoansRecord
+                                                .reference
+                                                .update(createLoansRecordData(
+                                              saldoCapital:
+                                                  (loans.by_id(widget!.loanid))
+                                                      .saldo_capital,
+                                              saldoInteres:
+                                                  (loans.by_id(widget!.loanid))
+                                                      .saldo_interes,
+                                              saldoMora:
+                                                  (loans.by_id(widget!.loanid))
+                                                      .saldo_mora,
+                                              estado:
+                                                  ((loans.by_id(widget!.loanId))
+                                                              .saldo_capital) <=
+                                                          0
+                                                      ? 'pagado'
+                                                      : 'activo',
+                                            ));
+
+                                            context.goNamed(
+                                                LoanManagementWidget.routeName);
+                                          },
+                                          child: wrapWithModel(
+                                            model: _model.buttonModel3,
+                                            updateCallback: () =>
+                                                safeSetState(() {}),
+                                            child: ButtonWidget(
+                                              iconPresent: false,
+                                              iconEndPresent: false,
+                                              content: 'Pagar Ahora',
+                                              variant: 'primary',
+                                              size: 'medium',
+                                              fullWidth: false,
+                                              loading: false,
+                                              disabled: false,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}

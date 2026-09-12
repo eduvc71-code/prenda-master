@@ -1,0 +1,758 @@
+import '/backend/backend.dart';
+import '/components/button/button_widget.dart';
+import '/components/section_header2/section_header2_widget.dart';
+import '/components/switch_component/switch_component_widget.dart';
+import '/components/text_field/text_field_widget.dart';
+import '/flutter_flow/flutter_flow_icon_button.dart';
+import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/flutter_flow_widgets.dart';
+import 'dart:ui';
+import '/index.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+
+import 'client_registration_model.dart';
+export 'client_registration_model.dart';
+
+class ClientRegistrationWidget extends StatefulWidget {
+  const ClientRegistrationWidget({super.key});
+
+  static String routeName = 'ClientRegistration';
+  static String routePath = '/clientRegistration';
+
+  @override
+  State<ClientRegistrationWidget> createState() =>
+      _ClientRegistrationWidgetState();
+}
+
+class _ClientRegistrationWidgetState extends State<ClientRegistrationWidget> {
+  late ClientRegistrationModel _model;
+
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _model = createModel(context, () => ClientRegistrationModel());
+  }
+
+  @override
+  void dispose() {
+    _model.dispose();
+
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      child: Scaffold(
+        key: scaffoldKey,
+        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+        body: Container(
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Container(
+                width: 0,
+                height: 0,
+              ),
+              Container(
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: FlutterFlowTheme.of(context).secondaryBackground,
+                        shape: BoxShape.rectangle,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Padding(
+                            padding:
+                                EdgeInsetsDirectional.fromSTEB(24, 16, 24, 16),
+                            child: Container(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      FlutterFlowIconButton(
+                                        borderRadius: 8,
+                                        buttonSize: 40,
+                                        fillColor: Colors.transparent,
+                                        icon: Icon(
+                                          Icons.arrow_back_rounded,
+                                          color: FlutterFlowTheme.of(context)
+                                              .primaryText,
+                                          size: 24,
+                                        ),
+                                        onPressed: () async {
+                                          context.pop();
+                                        },
+                                      ),
+                                      Text(
+                                        'Nuevo Cliente',
+                                        style: FlutterFlowTheme.of(context)
+                                            .titleLarge
+                                            .override(
+                                              font: GoogleFonts.inter(
+                                                fontWeight: FontWeight.bold,
+                                                fontStyle:
+                                                    FlutterFlowTheme.of(context)
+                                                        .titleLarge
+                                                        .fontStyle,
+                                              ),
+                                              letterSpacing: 0.0,
+                                              fontWeight: FontWeight.bold,
+                                              fontStyle:
+                                                  FlutterFlowTheme.of(context)
+                                                      .titleLarge
+                                                      .fontStyle,
+                                              lineHeight: 1.27,
+                                            ),
+                                      ),
+                                    ].divide(SizedBox(width: 16)),
+                                  ),
+                                  FlutterFlowIconButton(
+                                    borderRadius: 8,
+                                    buttonSize: 40,
+                                    fillColor: Colors.transparent,
+                                    icon: Icon(
+                                      Icons.info_outline_rounded,
+                                      color: FlutterFlowTheme.of(context)
+                                          .secondaryText,
+                                      size: 22,
+                                    ),
+                                    onPressed: () {
+                                      print('IconButton pressed ...');
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Container(
+                            height: 1,
+                            decoration: BoxDecoration(
+                              color: FlutterFlowTheme.of(context).alternate,
+                              shape: BoxShape.rectangle,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: Container(
+                        child: SingleChildScrollView(
+                          primary: false,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.all(24),
+                                child: Container(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          wrapWithModel(
+                                            model: _model.sectionHeaderModel1,
+                                            updateCallback: () =>
+                                                safeSetState(() {}),
+                                            child: SectionHeader2Widget(
+                                              icon: Icon(
+                                                Icons.badge_rounded,
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .primary,
+                                                size: 20,
+                                              ),
+                                              title: 'Documento de Identidad',
+                                            ),
+                                          ),
+                                          InkWell(
+                                            splashColor: Colors.transparent,
+                                            focusColor: Colors.transparent,
+                                            hoverColor: Colors.transparent,
+                                            highlightColor: Colors.transparent,
+                                            onTap: () async {
+                                              _model.nombre =
+                                                  '\"Juan Pérez García\"';
+                                              safeSetState(() {});
+                                              _model.carnet = '\"8472910 LP\"';
+                                              safeSetState(() {});
+                                              _model.dob = '\"15/05/1985\"';
+                                              safeSetState(() {});
+                                              _model.fotoCarnet =
+                                                  '\"assets/mock_id_photo.png\"';
+                                              safeSetState(() {});
+                                            },
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              child: Container(
+                                                height: 220,
+                                                decoration: BoxDecoration(
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .secondaryBackground,
+                                                  borderRadius:
+                                                      BorderRadius.circular(16),
+                                                  shape: BoxShape.rectangle,
+                                                  border: Border.all(
+                                                    color: FlutterFlowTheme.of(
+                                                            context)
+                                                        .alternate,
+                                                    width: 2,
+                                                  ),
+                                                ),
+                                                alignment:
+                                                    AlignmentDirectional(0, 0),
+                                                child: Stack(
+                                                  alignment:
+                                                      AlignmentDirectional(
+                                                          -1, -1),
+                                                  children: [
+                                                    Opacity(
+                                                      opacity: 0.4,
+                                                      child: CachedNetworkImage(
+                                                        fadeInDuration:
+                                                            Duration(
+                                                                milliseconds:
+                                                                    0),
+                                                        fadeOutDuration:
+                                                            Duration(
+                                                                milliseconds:
+                                                                    0),
+                                                        imageUrl:
+                                                            'https://dimg.dreamflow.cloud/v1/image/ID%20card%20scanning%20frame%20with%20OCR%20guides',
+                                                        fit: BoxFit.cover,
+                                                        alignment:
+                                                            Alignment(0, 0),
+                                                      ),
+                                                    ),
+                                                    Container(
+                                                      child: Padding(
+                                                        padding:
+                                                            EdgeInsets.all(24),
+                                                        child: Container(
+                                                          child: Container(
+                                                            alignment:
+                                                                AlignmentDirectional(
+                                                                    0, 0),
+                                                            child: Column(
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .min,
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                Container(
+                                                                  width: 64,
+                                                                  height: 64,
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    color: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .primary10,
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            9999),
+                                                                    shape: BoxShape
+                                                                        .rectangle,
+                                                                  ),
+                                                                  alignment:
+                                                                      AlignmentDirectional(
+                                                                          0, 0),
+                                                                  child: Icon(
+                                                                    Icons
+                                                                        .flip_camera_ios_rounded,
+                                                                    color: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .primary,
+                                                                    size: 32,
+                                                                  ),
+                                                                ),
+                                                                Text(
+                                                                  'Escanear Carnet (OCR)',
+                                                                  style: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .labelLarge
+                                                                      .override(
+                                                                        font: GoogleFonts
+                                                                            .inter(
+                                                                          fontWeight: FlutterFlowTheme.of(context)
+                                                                              .labelLarge
+                                                                              .fontWeight,
+                                                                          fontStyle: FlutterFlowTheme.of(context)
+                                                                              .labelLarge
+                                                                              .fontStyle,
+                                                                        ),
+                                                                        color: FlutterFlowTheme.of(context)
+                                                                            .primary,
+                                                                        letterSpacing:
+                                                                            0.0,
+                                                                        fontWeight: FlutterFlowTheme.of(context)
+                                                                            .labelLarge
+                                                                            .fontWeight,
+                                                                        fontStyle: FlutterFlowTheme.of(context)
+                                                                            .labelLarge
+                                                                            .fontStyle,
+                                                                        lineHeight:
+                                                                            1.33,
+                                                                      ),
+                                                                ),
+                                                                Text(
+                                                                  'Coloque el carnet dentro del marco para extraer datos automáticamente',
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                  style: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .bodySmall
+                                                                      .override(
+                                                                        font: GoogleFonts
+                                                                            .inter(
+                                                                          fontWeight: FlutterFlowTheme.of(context)
+                                                                              .bodySmall
+                                                                              .fontWeight,
+                                                                          fontStyle: FlutterFlowTheme.of(context)
+                                                                              .bodySmall
+                                                                              .fontStyle,
+                                                                        ),
+                                                                        color: FlutterFlowTheme.of(context)
+                                                                            .secondaryText,
+                                                                        letterSpacing:
+                                                                            0.0,
+                                                                        fontWeight: FlutterFlowTheme.of(context)
+                                                                            .bodySmall
+                                                                            .fontWeight,
+                                                                        fontStyle: FlutterFlowTheme.of(context)
+                                                                            .bodySmall
+                                                                            .fontStyle,
+                                                                        lineHeight:
+                                                                            1.38,
+                                                                      ),
+                                                                ),
+                                                              ].divide(SizedBox(
+                                                                  height: 16)),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ].divide(SizedBox(height: 16)),
+                                      ),
+                                      Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          wrapWithModel(
+                                            model: _model.sectionHeaderModel2,
+                                            updateCallback: () =>
+                                                safeSetState(() {}),
+                                            child: SectionHeader2Widget(
+                                              icon: Icon(
+                                                Icons.person_outline_rounded,
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .primary,
+                                                size: 20,
+                                              ),
+                                              title: 'Información Personal',
+                                            ),
+                                          ),
+                                          wrapWithModel(
+                                            model: _model.textFieldModel1,
+                                            updateCallback: () =>
+                                                safeSetState(() {}),
+                                            child: TextFieldWidget(
+                                              label: 'Nombre Completo',
+                                              labelPresent: true,
+                                              helper: '',
+                                              helperPresent: false,
+                                              leadingIcon: Icon(
+                                                Icons.person_rounded,
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .primaryText,
+                                                size: 24,
+                                              ),
+                                              leadingIconPresent: true,
+                                              trailingIconPresent: false,
+                                              hint: 'Extraído por OCR...',
+                                              value: _model.nombre,
+                                              onChange: '',
+                                              onSubmit: '',
+                                              variant: 'outlined',
+                                              error: false,
+                                            ),
+                                          ),
+                                          Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Expanded(
+                                                flex: 1,
+                                                child: wrapWithModel(
+                                                  model: _model.textFieldModel2,
+                                                  updateCallback: () =>
+                                                      safeSetState(() {}),
+                                                  child: TextFieldWidget(
+                                                    label: 'Nro. de Carnet',
+                                                    labelPresent: true,
+                                                    helper: '',
+                                                    helperPresent: false,
+                                                    leadingIcon: Icon(
+                                                      Icons.fingerprint_rounded,
+                                                      color:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .primaryText,
+                                                      size: 24,
+                                                    ),
+                                                    leadingIconPresent: true,
+                                                    trailingIconPresent: false,
+                                                    hint: '1234567 LP',
+                                                    value: _model.carnet,
+                                                    onChange: '',
+                                                    onSubmit: '',
+                                                    variant: 'outlined',
+                                                    error: false,
+                                                  ),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 1,
+                                                child: wrapWithModel(
+                                                  model: _model.textFieldModel3,
+                                                  updateCallback: () =>
+                                                      safeSetState(() {}),
+                                                  child: TextFieldWidget(
+                                                    label: 'Fecha Nacimiento',
+                                                    labelPresent: true,
+                                                    helper: '',
+                                                    helperPresent: false,
+                                                    leadingIcon: Icon(
+                                                      Icons.cake_rounded,
+                                                      color:
+                                                          FlutterFlowTheme.of(
+                                                                  context)
+                                                              .primaryText,
+                                                      size: 24,
+                                                    ),
+                                                    leadingIconPresent: true,
+                                                    trailingIconPresent: false,
+                                                    hint: 'DD/MM/AAAA',
+                                                    value: _model.dob,
+                                                    onChange: '',
+                                                    onSubmit: '',
+                                                    variant: 'outlined',
+                                                    error: false,
+                                                  ),
+                                                ),
+                                              ),
+                                            ].divide(SizedBox(width: 16)),
+                                          ),
+                                          wrapWithModel(
+                                            model: _model.textFieldModel4,
+                                            updateCallback: () =>
+                                                safeSetState(() {}),
+                                            child: TextFieldWidget(
+                                              label: 'Número de Celular',
+                                              labelPresent: true,
+                                              helper: '',
+                                              helperPresent: false,
+                                              leadingIcon: Icon(
+                                                Icons.phone_android_rounded,
+                                                color:
+                                                    FlutterFlowTheme.of(context)
+                                                        .primaryText,
+                                                size: 24,
+                                              ),
+                                              leadingIconPresent: true,
+                                              trailingIconPresent: false,
+                                              hint: '70000000',
+                                              value: _model.celular,
+                                              onChange: '',
+                                              onSubmit: '',
+                                              variant: 'outlined',
+                                              error: false,
+                                            ),
+                                          ),
+                                          wrapWithModel(
+                                            model: _model.textFieldModel5,
+                                            updateCallback: () =>
+                                                safeSetState(() {}),
+                                            child: TextFieldWidget(
+                                              label: 'Observaciones',
+                                              labelPresent: true,
+                                              helper: '',
+                                              helperPresent: false,
+                                              leadingIconPresent: false,
+                                              trailingIconPresent: false,
+                                              hint:
+                                                  'Notas adicionales sobre el cliente...',
+                                              value: _model.observaciones,
+                                              onChange: '',
+                                              onSubmit: '',
+                                              variant: 'outlined',
+                                              error: false,
+                                            ),
+                                          ),
+                                        ].divide(SizedBox(height: 16)),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsetsDirectional.fromSTEB(
+                                            0, 8, 0, 8),
+                                        child: Container(
+                                          child: Text(
+                                            _model.error!,
+                                            style: FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .override(
+                                                  font: GoogleFonts.inter(
+                                                    fontWeight:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .bodyMedium
+                                                            .fontWeight,
+                                                    fontStyle:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .bodyMedium
+                                                            .fontStyle,
+                                                  ),
+                                                  color: FlutterFlowTheme.of(
+                                                          context)
+                                                      .error,
+                                                  letterSpacing: 0.0,
+                                                  fontWeight:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontWeight,
+                                                  fontStyle:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontStyle,
+                                                  lineHeight: 1.47,
+                                                ),
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: FlutterFlowTheme.of(context)
+                                              .secondaryBackground,
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          shape: BoxShape.rectangle,
+                                          border: Border.all(
+                                            color: FlutterFlowTheme.of(context)
+                                                .alternate,
+                                            width: 1,
+                                          ),
+                                        ),
+                                        child: Padding(
+                                          padding: EdgeInsets.all(16),
+                                          child: Container(
+                                            child: wrapWithModel(
+                                              model: _model.switchModel,
+                                              updateCallback: () =>
+                                                  safeSetState(() {}),
+                                              child: SwitchComponentWidget(
+                                                label: 'Cliente Activo',
+                                                labelPresent: true,
+                                                variant: 'Android',
+                                                active: true,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ].divide(SizedBox(height: 24)),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: FlutterFlowTheme.of(context).secondaryBackground,
+                        shape: BoxShape.rectangle,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Container(
+                            height: 1,
+                            decoration: BoxDecoration(
+                              color: FlutterFlowTheme.of(context).alternate,
+                              shape: BoxShape.rectangle,
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(24),
+                            child: Container(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child: InkWell(
+                                      splashColor: Colors.transparent,
+                                      focusColor: Colors.transparent,
+                                      hoverColor: Colors.transparent,
+                                      highlightColor: Colors.transparent,
+                                      onTap: () async {
+                                        context.pop();
+                                      },
+                                      child: wrapWithModel(
+                                        model: _model.buttonModel1,
+                                        updateCallback: () =>
+                                            safeSetState(() {}),
+                                        child: ButtonWidget(
+                                          iconPresent: false,
+                                          iconEndPresent: false,
+                                          content: 'Cancelar',
+                                          variant: 'outline',
+                                          size: 'medium',
+                                          fullWidth: false,
+                                          loading: false,
+                                          disabled: false,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: InkWell(
+                                      splashColor: Colors.transparent,
+                                      focusColor: Colors.transparent,
+                                      hoverColor: Colors.transparent,
+                                      highlightColor: Colors.transparent,
+                                      onTap: () async {
+                                        if ((_model.nombre == null ||
+                                                _model.nombre == '') ||
+                                            (_model.carnet == null ||
+                                                _model.carnet == '')) {
+                                          _model.error =
+                                              '\"Nombre y Carnet son obligatorios\"';
+                                          safeSetState(() {});
+                                          return;
+                                        }
+                                        _model.error = '\"\"';
+                                        safeSetState(() {});
+
+                                        await ClientsRecord.collection
+                                            .doc()
+                                            .set(createClientsRecordData(
+                                              nombreCompleto: _model.nombre,
+                                              carnet: _model.carnet,
+                                              celular: _model.celular,
+                                              fotoCarnet: _model.fotoCarnet,
+                                              fechaRegistro:
+                                                  DateTime.now().toString(),
+                                              activo: _model.activo,
+                                              observaciones:
+                                                  _model.observaciones,
+                                            ));
+
+                                        context.goNamed(
+                                            ClientDirectoryWidget.routeName);
+                                      },
+                                      child: wrapWithModel(
+                                        model: _model.buttonModel2,
+                                        updateCallback: () =>
+                                            safeSetState(() {}),
+                                        child: ButtonWidget(
+                                          icon: Icon(
+                                            Icons.check_circle_rounded,
+                                            color: FlutterFlowTheme.of(context)
+                                                .primaryText,
+                                            size: 24,
+                                          ),
+                                          iconPresent: true,
+                                          iconEndPresent: false,
+                                          content: 'Guardar Cliente',
+                                          variant: 'primary',
+                                          size: 'medium',
+                                          fullWidth: false,
+                                          loading: false,
+                                          disabled: false,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ].divide(SizedBox(width: 16)),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
