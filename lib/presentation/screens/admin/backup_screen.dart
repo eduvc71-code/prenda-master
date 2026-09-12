@@ -612,16 +612,16 @@ class _DangerZone extends StatelessWidget {
               Text(
                 'Zona de Peligro',
                 style: AppTheme.of(context).titleSmall.copyWith(
-                  font: GoogleFonts.inter(
-                    fontWeight: FontWeight.bold,
-                    fontStyle: AppTheme.of(context).titleSmall.fontStyle,
-                  ),
-                  color: AppTheme.of(context).error,
-                  letterSpacing: 0.0,
-                  fontWeight: FontWeight.bold,
-                  fontStyle: AppTheme.of(context).titleSmall.fontStyle,
-                  lineHeight: 1.4,
-                ),
+                                  font: GoogleFonts.inter(
+                                    fontWeight: FontWeight.bold,
+                                    fontStyle: AppTheme.of(context).titleSmall.fontStyle,
+                                  ),
+                                  color: AppTheme.of(context).error,
+                                  letterSpacing: 0.0,
+                                  fontWeight: FontWeight.bold,
+                                  fontStyle: AppTheme.of(context).titleSmall.fontStyle,
+                                  lineHeight: 1.4,
+                                ),
               ),
               const SizedBox(height: 8),
               const Text(
