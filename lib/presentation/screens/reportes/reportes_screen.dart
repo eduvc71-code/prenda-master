@@ -498,36 +498,7 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
   }
 }
 
-class _ResumenMock {
-  final int totalPrestamos;
-  final int prestamosActivos;
-  final int prestamosVencidos;
-  final int prestamosPagados;
-  final double montoTotalPrestado;
-  final double montoTotalCobrado;
-  final double montoPendiente;
-  final double interesGenerado;
-  final int clientesActivos;
-  final int nuevosClientesMes;
-  final double pagosRecibidosMes;
-  final double pagosVencidosMes;
-  final String monedaDefault = 'Bs.';
 
-  _ResumenMock({
-    required this.totalPrestamos,
-    required this.prestamosActivos,
-    required this.prestamosVencidos,
-    required this.prestamosPagados,
-    required this.montoTotalPrestado,
-    required this.montoTotalCobrado,
-    required this.montoPendiente,
-    required this.interesGenerado,
-    required this.clientesActivos,
-    required this.nuevosClientesMes,
-    required this.pagosRecibidosMes,
-    required this.pagosVencidosMes,
-  });
-}
 
 class _KPIData {
   final String label;

@@ -118,7 +118,7 @@ class AppDatabase extends _$AppDatabase {
             estado: 'Activo',
             descripcion: '[Joyas (Oro/Plata)] Anillo de oro 18k',
           ));
-          final p2 = await into(prestamos).insert(PrestamosCompanion.insert(
+          await into(prestamos).insert(PrestamosCompanion.insert(
             clienteId: c2,
             monto: 800.0,
             moneda: 'Bs.',
@@ -129,7 +129,7 @@ class AppDatabase extends _$AppDatabase {
             estado: 'Vencido',
             descripcion: '[Electrónica / Celulares] Smartphone Samsung Galaxy',
           ));
-          final p3 = await into(prestamos).insert(PrestamosCompanion.insert(
+          await into(prestamos).insert(PrestamosCompanion.insert(
             clienteId: c3,
             monto: 2400.0,
             moneda: 'Bs.',
@@ -151,7 +151,7 @@ class AppDatabase extends _$AppDatabase {
             estado: 'Pagado',
             descripcion: '[Herramientas] Taladro Bosch profesional',
           ));
-          final p5 = await into(prestamos).insert(PrestamosCompanion.insert(
+          await into(prestamos).insert(PrestamosCompanion.insert(
             clienteId: c5,
             monto: 3000.0,
             moneda: 'Bs.',
@@ -167,16 +167,16 @@ class AppDatabase extends _$AppDatabase {
           await into(pagos).insert(PagosCompanion.insert(
             prestamoId: p4,
             monto: 500.0,
-            capitalPagado: 500.0,
-            interesPagado: 15.0,
+            capitalPagado: const Value(500.0),
+            interesPagado: const Value(15.0),
             fechaPago: DateTime.now().subtract(const Duration(days: 12)),
             metodo: 'Efectivo',
           ));
           await into(pagos).insert(PagosCompanion.insert(
             prestamoId: p1,
             monto: 45.0,
-            capitalPagado: 0.0,
-            interesPagado: 45.0,
+            capitalPagado: const Value(0.0),
+            interesPagado: const Value(45.0),
             fechaPago: DateTime.now().subtract(const Duration(days: 5)),
             metodo: 'Transferencia',
           ));

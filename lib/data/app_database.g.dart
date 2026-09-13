@@ -1603,6 +1603,30 @@ class $PagosTable extends Pagos with TableInfo<$PagosTable, Pago> {
     type: DriftSqlType.double,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _capitalPagadoMeta = const VerificationMeta(
+    'capitalPagado',
+  );
+  @override
+  late final GeneratedColumn<double> capitalPagado = GeneratedColumn<double>(
+    'capital_pagado',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0.0),
+  );
+  static const VerificationMeta _interesPagadoMeta = const VerificationMeta(
+    'interesPagado',
+  );
+  @override
+  late final GeneratedColumn<double> interesPagado = GeneratedColumn<double>(
+    'interes_pagado',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0.0),
+  );
   static const VerificationMeta _fechaPagoMeta = const VerificationMeta(
     'fechaPago',
   );
@@ -1644,6 +1668,8 @@ class $PagosTable extends Pagos with TableInfo<$PagosTable, Pago> {
     id,
     prestamoId,
     monto,
+    capitalPagado,
+    interesPagado,
     fechaPago,
     metodo,
     creadoEn,
@@ -1678,6 +1704,24 @@ class $PagosTable extends Pagos with TableInfo<$PagosTable, Pago> {
       );
     } else if (isInserting) {
       context.missing(_montoMeta);
+    }
+    if (data.containsKey('capital_pagado')) {
+      context.handle(
+        _capitalPagadoMeta,
+        capitalPagado.isAcceptableOrUnknown(
+          data['capital_pagado']!,
+          _capitalPagadoMeta,
+        ),
+      );
+    }
+    if (data.containsKey('interes_pagado')) {
+      context.handle(
+        _interesPagadoMeta,
+        interesPagado.isAcceptableOrUnknown(
+          data['interes_pagado']!,
+          _interesPagadoMeta,
+        ),
+      );
     }
     if (data.containsKey('fecha_pago')) {
       context.handle(
@@ -1722,6 +1766,14 @@ class $PagosTable extends Pagos with TableInfo<$PagosTable, Pago> {
         DriftSqlType.double,
         data['${effectivePrefix}monto'],
       )!,
+      capitalPagado: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}capital_pagado'],
+      )!,
+      interesPagado: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}interes_pagado'],
+      )!,
       fechaPago: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}fecha_pago'],
@@ -1747,6 +1799,8 @@ class Pago extends DataClass implements Insertable<Pago> {
   final int id;
   final int prestamoId;
   final double monto;
+  final double capitalPagado;
+  final double interesPagado;
   final DateTime fechaPago;
   final String metodo;
   final DateTime creadoEn;
@@ -1754,6 +1808,8 @@ class Pago extends DataClass implements Insertable<Pago> {
     required this.id,
     required this.prestamoId,
     required this.monto,
+    required this.capitalPagado,
+    required this.interesPagado,
     required this.fechaPago,
     required this.metodo,
     required this.creadoEn,
@@ -1764,6 +1820,8 @@ class Pago extends DataClass implements Insertable<Pago> {
     map['id'] = Variable<int>(id);
     map['prestamo_id'] = Variable<int>(prestamoId);
     map['monto'] = Variable<double>(monto);
+    map['capital_pagado'] = Variable<double>(capitalPagado);
+    map['interes_pagado'] = Variable<double>(interesPagado);
     map['fecha_pago'] = Variable<DateTime>(fechaPago);
     map['metodo'] = Variable<String>(metodo);
     map['creado_en'] = Variable<DateTime>(creadoEn);
@@ -1775,6 +1833,8 @@ class Pago extends DataClass implements Insertable<Pago> {
       id: Value(id),
       prestamoId: Value(prestamoId),
       monto: Value(monto),
+      capitalPagado: Value(capitalPagado),
+      interesPagado: Value(interesPagado),
       fechaPago: Value(fechaPago),
       metodo: Value(metodo),
       creadoEn: Value(creadoEn),
@@ -1790,6 +1850,8 @@ class Pago extends DataClass implements Insertable<Pago> {
       id: serializer.fromJson<int>(json['id']),
       prestamoId: serializer.fromJson<int>(json['prestamoId']),
       monto: serializer.fromJson<double>(json['monto']),
+      capitalPagado: serializer.fromJson<double>(json['capitalPagado']),
+      interesPagado: serializer.fromJson<double>(json['interesPagado']),
       fechaPago: serializer.fromJson<DateTime>(json['fechaPago']),
       metodo: serializer.fromJson<String>(json['metodo']),
       creadoEn: serializer.fromJson<DateTime>(json['creadoEn']),
@@ -1802,6 +1864,8 @@ class Pago extends DataClass implements Insertable<Pago> {
       'id': serializer.toJson<int>(id),
       'prestamoId': serializer.toJson<int>(prestamoId),
       'monto': serializer.toJson<double>(monto),
+      'capitalPagado': serializer.toJson<double>(capitalPagado),
+      'interesPagado': serializer.toJson<double>(interesPagado),
       'fechaPago': serializer.toJson<DateTime>(fechaPago),
       'metodo': serializer.toJson<String>(metodo),
       'creadoEn': serializer.toJson<DateTime>(creadoEn),
@@ -1812,6 +1876,8 @@ class Pago extends DataClass implements Insertable<Pago> {
     int? id,
     int? prestamoId,
     double? monto,
+    double? capitalPagado,
+    double? interesPagado,
     DateTime? fechaPago,
     String? metodo,
     DateTime? creadoEn,
@@ -1819,6 +1885,8 @@ class Pago extends DataClass implements Insertable<Pago> {
     id: id ?? this.id,
     prestamoId: prestamoId ?? this.prestamoId,
     monto: monto ?? this.monto,
+    capitalPagado: capitalPagado ?? this.capitalPagado,
+    interesPagado: interesPagado ?? this.interesPagado,
     fechaPago: fechaPago ?? this.fechaPago,
     metodo: metodo ?? this.metodo,
     creadoEn: creadoEn ?? this.creadoEn,
@@ -1830,6 +1898,12 @@ class Pago extends DataClass implements Insertable<Pago> {
           ? data.prestamoId.value
           : this.prestamoId,
       monto: data.monto.present ? data.monto.value : this.monto,
+      capitalPagado: data.capitalPagado.present
+          ? data.capitalPagado.value
+          : this.capitalPagado,
+      interesPagado: data.interesPagado.present
+          ? data.interesPagado.value
+          : this.interesPagado,
       fechaPago: data.fechaPago.present ? data.fechaPago.value : this.fechaPago,
       metodo: data.metodo.present ? data.metodo.value : this.metodo,
       creadoEn: data.creadoEn.present ? data.creadoEn.value : this.creadoEn,
@@ -1842,6 +1916,8 @@ class Pago extends DataClass implements Insertable<Pago> {
           ..write('id: $id, ')
           ..write('prestamoId: $prestamoId, ')
           ..write('monto: $monto, ')
+          ..write('capitalPagado: $capitalPagado, ')
+          ..write('interesPagado: $interesPagado, ')
           ..write('fechaPago: $fechaPago, ')
           ..write('metodo: $metodo, ')
           ..write('creadoEn: $creadoEn')
@@ -1850,8 +1926,16 @@ class Pago extends DataClass implements Insertable<Pago> {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, prestamoId, monto, fechaPago, metodo, creadoEn);
+  int get hashCode => Object.hash(
+    id,
+    prestamoId,
+    monto,
+    capitalPagado,
+    interesPagado,
+    fechaPago,
+    metodo,
+    creadoEn,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1859,6 +1943,8 @@ class Pago extends DataClass implements Insertable<Pago> {
           other.id == this.id &&
           other.prestamoId == this.prestamoId &&
           other.monto == this.monto &&
+          other.capitalPagado == this.capitalPagado &&
+          other.interesPagado == this.interesPagado &&
           other.fechaPago == this.fechaPago &&
           other.metodo == this.metodo &&
           other.creadoEn == this.creadoEn);
@@ -1868,6 +1954,8 @@ class PagosCompanion extends UpdateCompanion<Pago> {
   final Value<int> id;
   final Value<int> prestamoId;
   final Value<double> monto;
+  final Value<double> capitalPagado;
+  final Value<double> interesPagado;
   final Value<DateTime> fechaPago;
   final Value<String> metodo;
   final Value<DateTime> creadoEn;
@@ -1875,6 +1963,8 @@ class PagosCompanion extends UpdateCompanion<Pago> {
     this.id = const Value.absent(),
     this.prestamoId = const Value.absent(),
     this.monto = const Value.absent(),
+    this.capitalPagado = const Value.absent(),
+    this.interesPagado = const Value.absent(),
     this.fechaPago = const Value.absent(),
     this.metodo = const Value.absent(),
     this.creadoEn = const Value.absent(),
@@ -1883,6 +1973,8 @@ class PagosCompanion extends UpdateCompanion<Pago> {
     this.id = const Value.absent(),
     required int prestamoId,
     required double monto,
+    this.capitalPagado = const Value.absent(),
+    this.interesPagado = const Value.absent(),
     required DateTime fechaPago,
     required String metodo,
     this.creadoEn = const Value.absent(),
@@ -1894,6 +1986,8 @@ class PagosCompanion extends UpdateCompanion<Pago> {
     Expression<int>? id,
     Expression<int>? prestamoId,
     Expression<double>? monto,
+    Expression<double>? capitalPagado,
+    Expression<double>? interesPagado,
     Expression<DateTime>? fechaPago,
     Expression<String>? metodo,
     Expression<DateTime>? creadoEn,
@@ -1902,6 +1996,8 @@ class PagosCompanion extends UpdateCompanion<Pago> {
       if (id != null) 'id': id,
       if (prestamoId != null) 'prestamo_id': prestamoId,
       if (monto != null) 'monto': monto,
+      if (capitalPagado != null) 'capital_pagado': capitalPagado,
+      if (interesPagado != null) 'interes_pagado': interesPagado,
       if (fechaPago != null) 'fecha_pago': fechaPago,
       if (metodo != null) 'metodo': metodo,
       if (creadoEn != null) 'creado_en': creadoEn,
@@ -1912,6 +2008,8 @@ class PagosCompanion extends UpdateCompanion<Pago> {
     Value<int>? id,
     Value<int>? prestamoId,
     Value<double>? monto,
+    Value<double>? capitalPagado,
+    Value<double>? interesPagado,
     Value<DateTime>? fechaPago,
     Value<String>? metodo,
     Value<DateTime>? creadoEn,
@@ -1920,6 +2018,8 @@ class PagosCompanion extends UpdateCompanion<Pago> {
       id: id ?? this.id,
       prestamoId: prestamoId ?? this.prestamoId,
       monto: monto ?? this.monto,
+      capitalPagado: capitalPagado ?? this.capitalPagado,
+      interesPagado: interesPagado ?? this.interesPagado,
       fechaPago: fechaPago ?? this.fechaPago,
       metodo: metodo ?? this.metodo,
       creadoEn: creadoEn ?? this.creadoEn,
@@ -1937,6 +2037,12 @@ class PagosCompanion extends UpdateCompanion<Pago> {
     }
     if (monto.present) {
       map['monto'] = Variable<double>(monto.value);
+    }
+    if (capitalPagado.present) {
+      map['capital_pagado'] = Variable<double>(capitalPagado.value);
+    }
+    if (interesPagado.present) {
+      map['interes_pagado'] = Variable<double>(interesPagado.value);
     }
     if (fechaPago.present) {
       map['fecha_pago'] = Variable<DateTime>(fechaPago.value);
@@ -1956,6 +2062,8 @@ class PagosCompanion extends UpdateCompanion<Pago> {
           ..write('id: $id, ')
           ..write('prestamoId: $prestamoId, ')
           ..write('monto: $monto, ')
+          ..write('capitalPagado: $capitalPagado, ')
+          ..write('interesPagado: $interesPagado, ')
           ..write('fechaPago: $fechaPago, ')
           ..write('metodo: $metodo, ')
           ..write('creadoEn: $creadoEn')
@@ -3263,6 +3371,8 @@ typedef $$PagosTableCreateCompanionBuilder = PagosCompanion Function({
   Value<int> id,
   required int prestamoId,
   required double monto,
+  Value<double> capitalPagado,
+  Value<double> interesPagado,
   required DateTime fechaPago,
   required String metodo,
   Value<DateTime> creadoEn,
@@ -3271,6 +3381,8 @@ typedef $$PagosTableUpdateCompanionBuilder = PagosCompanion Function({
   Value<int> id,
   Value<int> prestamoId,
   Value<double> monto,
+  Value<double> capitalPagado,
+  Value<double> interesPagado,
   Value<DateTime> fechaPago,
   Value<String> metodo,
   Value<DateTime> creadoEn,
@@ -3313,6 +3425,16 @@ class $$PagosTableFilterComposer extends Composer<_$AppDatabase, $PagosTable> {
 
   ColumnFilters<double> get monto => $composableBuilder(
     column: $table.monto,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get capitalPagado => $composableBuilder(
+    column: $table.capitalPagado,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get interesPagado => $composableBuilder(
+    column: $table.interesPagado,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3374,6 +3496,16 @@ class $$PagosTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<double> get capitalPagado => $composableBuilder(
+    column: $table.capitalPagado,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get interesPagado => $composableBuilder(
+    column: $table.interesPagado,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get fechaPago => $composableBuilder(
     column: $table.fechaPago,
     builder: (column) => ColumnOrderings(column),
@@ -3427,6 +3559,16 @@ class $$PagosTableAnnotationComposer
 
   GeneratedColumn<double> get monto =>
       $composableBuilder(column: $table.monto, builder: (column) => column);
+
+  GeneratedColumn<double> get capitalPagado => $composableBuilder(
+    column: $table.capitalPagado,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get interesPagado => $composableBuilder(
+    column: $table.interesPagado,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get fechaPago =>
       $composableBuilder(column: $table.fechaPago, builder: (column) => column);
@@ -3492,6 +3634,8 @@ class $$PagosTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<int> prestamoId = const Value.absent(),
                 Value<double> monto = const Value.absent(),
+                Value<double> capitalPagado = const Value.absent(),
+                Value<double> interesPagado = const Value.absent(),
                 Value<DateTime> fechaPago = const Value.absent(),
                 Value<String> metodo = const Value.absent(),
                 Value<DateTime> creadoEn = const Value.absent(),
@@ -3499,6 +3643,8 @@ class $$PagosTableTableManager
                 id: id,
                 prestamoId: prestamoId,
                 monto: monto,
+                capitalPagado: capitalPagado,
+                interesPagado: interesPagado,
                 fechaPago: fechaPago,
                 metodo: metodo,
                 creadoEn: creadoEn,
@@ -3508,6 +3654,8 @@ class $$PagosTableTableManager
                 Value<int> id = const Value.absent(),
                 required int prestamoId,
                 required double monto,
+                Value<double> capitalPagado = const Value.absent(),
+                Value<double> interesPagado = const Value.absent(),
                 required DateTime fechaPago,
                 required String metodo,
                 Value<DateTime> creadoEn = const Value.absent(),
@@ -3515,6 +3663,8 @@ class $$PagosTableTableManager
                 id: id,
                 prestamoId: prestamoId,
                 monto: monto,
+                capitalPagado: capitalPagado,
+                interesPagado: interesPagado,
                 fechaPago: fechaPago,
                 metodo: metodo,
                 creadoEn: creadoEn,
