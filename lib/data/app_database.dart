@@ -65,7 +65,7 @@ class AppDatabase extends _$AppDatabase {
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (Migrator m) async {
           await m.createAll();
-          // Seed sample initial data with real relational records
+          // Seed sample initial data with diverse loan states (>61 days moroso, 75-90 days recuperacion, >90 days remate)
           final c1 = await into(clientes).insert(ClientesCompanion.insert(
             nombre: 'Juan',
             apellido: 'Pérez',
@@ -118,28 +118,33 @@ class AppDatabase extends _$AppDatabase {
             estado: 'Activo',
             descripcion: '[Joyas (Oro/Plata)] Anillo de oro 18k',
           ));
+          
+          // María García: 65 days overdue -> Moroso Crítico (>61 días)
           await into(prestamos).insert(PrestamosCompanion.insert(
             clienteId: c2,
             monto: 800.0,
             moneda: 'Bs.',
             interesMensual: 3.0,
             plazoDias: 30,
-            fechaInicio: DateTime.now().subtract(const Duration(days: 35)),
-            fechaVencimiento: DateTime.now().subtract(const Duration(days: 5)),
+            fechaInicio: DateTime.now().subtract(const Duration(days: 95)),
+            fechaVencimiento: DateTime.now().subtract(const Duration(days: 65)),
             estado: 'Vencido',
             descripcion: '[Electrónica / Celulares] Smartphone Samsung Galaxy',
           ));
+
+          // Carlos López: 82 days overdue -> Ventana de Recuperación (75-90 días)
           await into(prestamos).insert(PrestamosCompanion.insert(
             clienteId: c3,
             monto: 2400.0,
             moneda: 'Bs.',
             interesMensual: 3.0,
             plazoDias: 30,
-            fechaInicio: DateTime.now(),
-            fechaVencimiento: DateTime.now().add(const Duration(days: 30)),
-            estado: 'Activo',
+            fechaInicio: DateTime.now().subtract(const Duration(days: 112)),
+            fechaVencimiento: DateTime.now().subtract(const Duration(days: 82)),
+            estado: 'Vencido',
             descripcion: '[Relojes] Reloj Rolex Submariner',
           ));
+
           final p4 = await into(prestamos).insert(PrestamosCompanion.insert(
             clienteId: c4,
             monto: 500.0,
@@ -151,19 +156,21 @@ class AppDatabase extends _$AppDatabase {
             estado: 'Pagado',
             descripcion: '[Herramientas] Taladro Bosch profesional',
           ));
+
+          // Pedro Sánchez: 95 days overdue -> Prenda Lista para Remate (>90 días)
           await into(prestamos).insert(PrestamosCompanion.insert(
             clienteId: c5,
             monto: 3000.0,
             moneda: 'Bs.',
             interesMensual: 3.0,
             plazoDias: 30,
-            fechaInicio: DateTime.now().subtract(const Duration(days: 23)),
-            fechaVencimiento: DateTime.now().add(const Duration(days: 7)),
-            estado: 'Pendiente',
+            fechaInicio: DateTime.now().subtract(const Duration(days: 125)),
+            fechaVencimiento: DateTime.now().subtract(const Duration(days: 95)),
+            estado: 'Vencido',
             descripcion: '[Electrodomésticos] Televisor LG 55 pulgadas',
           ));
 
-          // Seed sample payments with capital and interest breakdown
+          // Seed sample payments
           await into(pagos).insert(PagosCompanion.insert(
             prestamoId: p4,
             monto: 500.0,
