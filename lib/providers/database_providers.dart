@@ -35,6 +35,11 @@ final prendasByPrestamoProvider = StreamProvider.family<List<Prenda>, int>((ref,
 });
 
 // Pago providers
+final pagosProvider = StreamProvider<List<Pago>>((ref) {
+  final db = ref.read(databaseProvider);
+  return db.watchAllPagos();
+});
+
 final pagosByPrestamoProvider = StreamProvider.family<List<Pago>, int>((ref, prestamoId) {
   final db = ref.read(databaseProvider);
   return (db.select(db.pagos)..where((t) => t.prestamoId.equals(prestamoId))).watch();

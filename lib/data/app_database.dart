@@ -45,6 +45,8 @@ class Pagos extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get prestamoId => integer().references(Prestamos, #id)();
   RealColumn get monto => real()();
+  RealColumn get capitalPagado => real().withDefault(const Constant(0.0))();
+  RealColumn get interesPagado => real().withDefault(const Constant(0.0))();
   DateTimeColumn get fechaPago => dateTime()();
   TextColumn get metodo => text().withLength(min: 1, max: 50)();
   DateTimeColumn get creadoEn => dateTime().withDefault(currentDateAndTime)();
@@ -63,7 +65,7 @@ class AppDatabase extends _$AppDatabase {
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (Migrator m) async {
           await m.createAll();
-          // Seed sample initial data so the app has realistic records immediately
+          // Seed sample initial data with real relational records
           final c1 = await into(clientes).insert(ClientesCompanion.insert(
             nombre: 'Juan',
             apellido: 'Pérez',
@@ -105,7 +107,7 @@ class AppDatabase extends _$AppDatabase {
             direccion: 'Oruro',
           ));
 
-          await into(prestamos).insert(PrestamosCompanion.insert(
+          final p1 = await into(prestamos).insert(PrestamosCompanion.insert(
             clienteId: c1,
             monto: 1500.0,
             moneda: 'Bs.',
@@ -116,7 +118,7 @@ class AppDatabase extends _$AppDatabase {
             estado: 'Activo',
             descripcion: '[Joyas (Oro/Plata)] Anillo de oro 18k',
           ));
-          await into(prestamos).insert(PrestamosCompanion.insert(
+          final p2 = await into(prestamos).insert(PrestamosCompanion.insert(
             clienteId: c2,
             monto: 800.0,
             moneda: 'Bs.',
@@ -127,7 +129,7 @@ class AppDatabase extends _$AppDatabase {
             estado: 'Vencido',
             descripcion: '[Electrónica / Celulares] Smartphone Samsung Galaxy',
           ));
-          await into(prestamos).insert(PrestamosCompanion.insert(
+          final p3 = await into(prestamos).insert(PrestamosCompanion.insert(
             clienteId: c3,
             monto: 2400.0,
             moneda: 'Bs.',
@@ -138,7 +140,7 @@ class AppDatabase extends _$AppDatabase {
             estado: 'Activo',
             descripcion: '[Relojes] Reloj Rolex Submariner',
           ));
-          await into(prestamos).insert(PrestamosCompanion.insert(
+          final p4 = await into(prestamos).insert(PrestamosCompanion.insert(
             clienteId: c4,
             monto: 500.0,
             moneda: 'Bs.',
@@ -149,7 +151,7 @@ class AppDatabase extends _$AppDatabase {
             estado: 'Pagado',
             descripcion: '[Herramientas] Taladro Bosch profesional',
           ));
-          await into(prestamos).insert(PrestamosCompanion.insert(
+          final p5 = await into(prestamos).insert(PrestamosCompanion.insert(
             clienteId: c5,
             monto: 3000.0,
             moneda: 'Bs.',
@@ -159,6 +161,24 @@ class AppDatabase extends _$AppDatabase {
             fechaVencimiento: DateTime.now().add(const Duration(days: 7)),
             estado: 'Pendiente',
             descripcion: '[Electrodomésticos] Televisor LG 55 pulgadas',
+          ));
+
+          // Seed sample payments with capital and interest breakdown
+          await into(pagos).insert(PagosCompanion.insert(
+            prestamoId: p4,
+            monto: 500.0,
+            capitalPagado: 500.0,
+            interesPagado: 15.0,
+            fechaPago: DateTime.now().subtract(const Duration(days: 12)),
+            metodo: 'Efectivo',
+          ));
+          await into(pagos).insert(PagosCompanion.insert(
+            prestamoId: p1,
+            monto: 45.0,
+            capitalPagado: 0.0,
+            interesPagado: 45.0,
+            fechaPago: DateTime.now().subtract(const Duration(days: 5)),
+            metodo: 'Transferencia',
           ));
         },
       );
@@ -194,6 +214,8 @@ class AppDatabase extends _$AppDatabase {
   // Helper methods for pagos
   Future<List<Pago>> getPagosByPrestamo(int prestamoId) =>
       (select(pagos)..where((p) => p.prestamoId.equals(prestamoId))).get();
+  Future<List<Pago>> getAllPagos() => select(pagos).get();
+  Stream<List<Pago>> watchAllPagos() => select(pagos).watch();
   Future<int> insertPago(PagosCompanion pago) => into(pagos).insert(pago);
 
   // Clear / Vaciar Base de Datos

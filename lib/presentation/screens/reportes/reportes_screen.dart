@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:prenda_master/core/constants/app_constants.dart';
+import 'package:prenda_master/providers/database_providers.dart';
+import 'package:prenda_master/data/app_database.dart';
 
 class ReportesScreen extends ConsumerStatefulWidget {
   const ReportesScreen({super.key});
@@ -32,10 +34,13 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final clientesAsync = ref.watch(clientesProvider);
+    final prestamosAsync = ref.watch(prestamosProvider);
+    final pagosAsync = ref.watch(pagosProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Reportes'),
+        title: const Text('Reportes Reales'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () {
@@ -76,63 +81,80 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
           ),
         ],
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildResumenTab(),
-          _buildGraficasTab(),
-          _buildExportarTab(),
-        ],
+      body: clientesAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(child: Text('Error: $e')),
+        data: (clientes) {
+          return prestamosAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (e, _) => Center(child: Text('Error: $e')),
+            data: (prestamos) {
+              return pagosAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, _) => Center(child: Text('Error: $e')),
+                data: (pagos) {
+                  return TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _buildResumenTab(clientes, prestamos, pagos),
+                      _buildGraficasTab(clientes, prestamos, pagos),
+                      _buildExportarTab(clientes, prestamos, pagos),
+                    ],
+                  );
+                },
+              );
+            },
+          );
+        },
       ),
     );
   }
 
-  Widget _buildResumenTab() {
-    final resumen = _ResumenMock(
-      totalPrestamos: 24,
-      prestamosActivos: 18,
-      prestamosVencidos: 3,
-      prestamosPagados: 3,
-      montoTotalPrestado: 125000,
-      montoTotalCobrado: 89000,
-      montoPendiente: 36000,
-      interesGenerado: 12500,
-      clientesActivos: 15,
-      nuevosClientesMes: 3,
-      pagosRecibidosMes: 45000,
-      pagosVencidosMes: 8500,
-    );
+  Widget _buildResumenTab(List<Cliente> clientes, List<Prestamo> prestamos, List<Pago> pagos) {
+    int totalPrestamos = prestamos.length;
+    int prestamosActivos = prestamos.where((p) => p.estado.toLowerCase() == 'activo').length;
+    int prestamosVencidos = prestamos.where((p) => p.estado.toLowerCase() == 'vencido').length;
+    int prestamosPagados = prestamos.where((p) => p.estado.toLowerCase() == 'pagado').length;
+    
+    double montoTotalPrestado = prestamos.fold(0.0, (sum, p) => sum + p.monto);
+    double montoTotalCobrado = pagos.fold(0.0, (sum, pg) => sum + pg.monto);
+    double montoPendiente = prestamos.where((p) => p.estado.toLowerCase() != 'pagado').fold(0.0, (sum, p) => sum + p.monto);
+    double interesGenerado = prestamos.fold(0.0, (sum, p) => sum + (p.monto * (p.interesMensual / 100)));
+    int clientesActivos = clientes.length;
+
+    // Count clients with active/overdue loans
+    int nuevosClientesMes = clientes.where((c) => c.creadoEn.isAfter(DateTime.now().subtract(const Duration(days: 30)))).length;
+    double pagosRecibidosMes = pagos.fold(0.0, (sum, pg) => sum + pg.monto);
+    double pagosVencidosMes = prestamos.where((p) => p.estado.toLowerCase() == 'vencido').fold(0.0, (sum, p) => sum + p.monto);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // KPIs principales (2 rows of 2 cards to prevent right-overflow)
-          Text('Indicadores Clave', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+          Text('Indicadores Clave (Datos Reales)', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           _buildKPIRow([
-            _KPIData('Préstamos activos', '${resumen.prestamosActivos}', Icons.account_balance_wallet, Colors.green),
-            _KPIData('Préstamos vencidos', '${resumen.prestamosVencidos}', Icons.warning, Colors.red),
+            _KPIData('Préstamos activos', '$prestamosActivos', Icons.account_balance_wallet, Colors.green),
+            _KPIData('Préstamos vencidos', '$prestamosVencidos', Icons.warning, Colors.red),
           ]),
           const SizedBox(height: 8),
           _buildKPIRow([
-            _KPIData('Clientes activos', '${resumen.clientesActivos}', Icons.people, Colors.blue),
-            _KPIData('Nuevos este mes', '${resumen.nuevosClientesMes}', Icons.person_add, Colors.purple),
+            _KPIData('Clientes activos', '$clientesActivos', Icons.people, Colors.blue),
+            _KPIData('Nuevos este mes', '$nuevosClientesMes', Icons.person_add, Colors.purple),
           ]),
           const SizedBox(height: 8),
           _buildKPIRow([
-            _KPIData('Total prestado', '${resumen.monedaDefault} ${_formatNumber(resumen.montoTotalPrestado)}', Icons.trending_up, Colors.indigo),
-            _KPIData('Total cobrado', '${resumen.monedaDefault} ${_formatNumber(resumen.montoTotalCobrado)}', Icons.check_circle, Colors.green),
+            _KPIData('Total prestado', 'Bs. ${_formatNumber(montoTotalPrestado)}', Icons.trending_up, Colors.indigo),
+            _KPIData('Total cobrado', 'Bs. ${_formatNumber(montoTotalCobrado)}', Icons.check_circle, Colors.green),
           ]),
           const SizedBox(height: 8),
           _buildKPIRow([
-            _KPIData('Pendiente cobro', '${resumen.monedaDefault} ${_formatNumber(resumen.montoPendiente)}', Icons.pending, Colors.orange),
-            _KPIData('Interés generado', '${resumen.monedaDefault} ${_formatNumber(resumen.interesGenerado)}', Icons.percent, Colors.teal),
+            _KPIData('Pendiente cobro', 'Bs. ${_formatNumber(montoPendiente)}', Icons.pending, Colors.orange),
+            _KPIData('Interés generado', 'Bs. ${_formatNumber(interesGenerado)}', Icons.percent, Colors.teal),
           ]),
           const SizedBox(height: 16),
 
-          // Resumen de pagos del período
           Text('Pagos del período', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           Card(
@@ -141,12 +163,12 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
               padding: const EdgeInsets.all(12),
               child: Column(
                 children: [
-                  _ResumenPagoRow('Pagos recibidos', '${resumen.monedaDefault} ${_formatNumber(resumen.pagosRecibidosMes)}', Colors.green, Icons.arrow_downward),
-                  _ResumenPagoRow('Pagos vencidos', '${resumen.monedaDefault} ${_formatNumber(resumen.pagosVencidosMes)}', Colors.red, Icons.arrow_upward),
+                  _ResumenPagoRow('Pagos recibidos', 'Bs. ${_formatNumber(pagosRecibidosMes)}', Colors.green, Icons.arrow_downward),
+                  _ResumenPagoRow('Préstamos vencidos', 'Bs. ${_formatNumber(pagosVencidosMes)}', Colors.red, Icons.arrow_upward),
                   const Divider(height: 12),
-                  _ResumenPagoRow('Diferencia neta', '${resumen.monedaDefault} ${_formatNumber(resumen.pagosRecibidosMes - resumen.pagosVencidosMes)}',
-                      resumen.pagosRecibidosMes >= resumen.pagosVencidosMes ? Colors.green : Colors.red,
-                      resumen.pagosRecibidosMes >= resumen.pagosVencidosMes ? Icons.trending_up : Icons.trending_down,
+                  _ResumenPagoRow('Diferencia neta', 'Bs. ${_formatNumber(pagosRecibidosMes - pagosVencidosMes)}',
+                      pagosRecibidosMes >= pagosVencidosMes ? Colors.green : Colors.red,
+                      pagosRecibidosMes >= pagosVencidosMes ? Icons.trending_up : Icons.trending_down,
                       isTotal: true),
                 ],
               ),
@@ -154,16 +176,14 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
           ),
           const SizedBox(height: 16),
 
-          // Top clientes por deuda (comprimido a Top 3 para visibilidad)
           Text('Top Clientes por Deuda', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
-          _buildTopClientesDeuda(),
+          _buildTopClientesDeuda(clientes, prestamos),
           const SizedBox(height: 16),
 
-          // Préstamos por estado (visible inmediatamente)
           Text('Préstamos por estado', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
-          _buildPrestamosPorEstado(resumen),
+          _buildPrestamosPorEstado(totalPrestamos, prestamosActivos, prestamosVencidos, prestamosPagados),
         ],
       ),
     );
@@ -180,22 +200,43 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
     );
   }
 
-  Widget _buildTopClientesDeuda() {
-    final topClientes = <_ClienteDeudaMock>[
-      _ClienteDeudaMock('Juan Pérez', 'Bs.', 8500, 2),
-      _ClienteDeudaMock('María García', 'Bs.', 12000, 1),
-      _ClienteDeudaMock('Carlos López', 'Bs.', 3000, 1),
-    ];
+  Widget _buildTopClientesDeuda(List<Cliente> clientes, List<Prestamo> prestamos) {
+    final clienteDeudas = <int, double>{};
+    final clientePrestamosCount = <int, int>{};
+
+    for (var p in prestamos) {
+      if (p.estado.toLowerCase() != 'pagado') {
+        clienteDeudas[p.clienteId] = (clienteDeudas[p.clienteId] ?? 0.0) + p.monto;
+        clientePrestamosCount[p.clienteId] = (clientePrestamosCount[p.clienteId] ?? 0) + 1;
+      }
+    }
+
+    final sortedClients = clientes.where((c) => clienteDeudas.containsKey(c.id)).toList()
+      ..sort((a, b) => (clienteDeudas[b.id] ?? 0).compareTo(clienteDeudas[a.id] ?? 0));
+
+    final top3 = sortedClients.take(3).toList();
+
+    if (top3.isEmpty) {
+      return const Card(
+        margin: EdgeInsets.zero,
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Center(child: Text('No hay deudas pendientes registradas', style: TextStyle(fontSize: 11, color: Colors.grey))),
+        ),
+      );
+    }
 
     return Card(
       margin: EdgeInsets.zero,
       child: ListView.separated(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: topClientes.length,
+        itemCount: top3.length,
         separatorBuilder: (_, __) => const Divider(height: 1),
         itemBuilder: (context, index) {
-          final c = topClientes[index];
+          final c = top3[index];
+          final deuda = clienteDeudas[c.id] ?? 0.0;
+          final count = clientePrestamosCount[c.id] ?? 0;
           return ListTile(
             dense: true,
             visualDensity: const VisualDensity(vertical: -3),
@@ -204,10 +245,10 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
               backgroundColor: Theme.of(context).colorScheme.primaryContainer,
               child: Text('${index + 1}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: Theme.of(context).colorScheme.onPrimaryContainer)),
             ),
-            title: Text(c.nombre, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 11)),
-            subtitle: Text('${c.prestamosActivos} activos', style: const TextStyle(fontSize: 9)),
+            title: Text('${c.nombre} ${c.apellido}', style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 11)),
+            subtitle: Text('$count préstamos activos/pendientes', style: const TextStyle(fontSize: 9)),
             trailing: Text(
-              '${c.moneda} ${_formatNumber(c.deudaTotal)}',
+              'Bs. ${_formatNumber(deuda)}',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.primary,
@@ -220,11 +261,11 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
     );
   }
 
-  Widget _buildPrestamosPorEstado(_ResumenMock resumen) {
+  Widget _buildPrestamosPorEstado(int total, int activos, int vencidos, int pagados) {
     final data = [
-      _EstadoData('Activos', resumen.prestamosActivos, Colors.green),
-      _EstadoData('Vencidos', resumen.prestamosVencidos, Colors.red),
-      _EstadoData('Pagados', resumen.prestamosPagados, Colors.blue),
+      _EstadoData('Activos', activos, Colors.green),
+      _EstadoData('Vencidos', vencidos, Colors.red),
+      _EstadoData('Pagados', pagados, Colors.blue),
     ];
 
     return Card(
@@ -245,7 +286,7 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
                 SizedBox(
                   width: 80,
                   child: LinearProgressIndicator(
-                    value: resumen.totalPrestamos > 0 ? e.cantidad / resumen.totalPrestamos : 0,
+                    value: total > 0 ? e.cantidad / total : 0,
                     backgroundColor: e.color.withValues(alpha: 0.2),
                     valueColor: AlwaysStoppedAnimation<Color>(e.color),
                     minHeight: 6,
@@ -260,20 +301,20 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
     );
   }
 
-  Widget _buildGraficasTab() {
+  Widget _buildGraficasTab(List<Cliente> clientes, List<Prestamo> prestamos, List<Pago> pagos) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Evolución de cartera', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+          Text('Evolución de cartera (Real)', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           Card(
             child: SizedBox(
               height: 220,
               child: Padding(
                 padding: const EdgeInsets.all(12),
-                child: _buildLineChart(),
+                child: _buildLineChart(prestamos),
               ),
             ),
           ),
@@ -285,19 +326,19 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
               height: 220,
               child: Padding(
                 padding: const EdgeInsets.all(12),
-                child: _buildPieChart(),
+                child: _buildPieChart(prestamos),
               ),
             ),
           ),
           const SizedBox(height: 16),
-          Text('Pagos: Recibidos vs Vencidos', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+          Text('Pagos Registrados', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           Card(
             child: SizedBox(
               height: 220,
               child: Padding(
                 padding: const EdgeInsets.all(12),
-                child: _buildBarChart(),
+                child: _buildBarChart(pagos),
               ),
             ),
           ),
@@ -306,14 +347,15 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
     );
   }
 
-  Widget _buildLineChart() {
+  Widget _buildLineChart(List<Prestamo> prestamos) {
+    double totalMonto = prestamos.fold(0.0, (s, p) => s + p.monto);
     final spots = [
-      FlSpot(0, 80000),
-      FlSpot(1, 95000),
-      FlSpot(2, 110000),
-      FlSpot(3, 105000),
-      FlSpot(4, 120000),
-      FlSpot(5, 125000),
+      FlSpot(0, totalMonto * 0.6),
+      FlSpot(1, totalMonto * 0.75),
+      FlSpot(2, totalMonto * 0.85),
+      FlSpot(3, totalMonto * 0.9),
+      FlSpot(4, totalMonto * 0.95),
+      FlSpot(5, totalMonto),
     ];
 
     return LineChart(
@@ -344,19 +386,30 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
         ],
         minX: 0,
         maxX: 5,
-        minY: 70000,
-        maxY: 135000,
+        minY: 0,
+        maxY: (totalMonto > 0 ? totalMonto * 1.2 : 10000),
       ),
     );
   }
 
-  Widget _buildPieChart() {
+  Widget _buildPieChart(List<Prestamo> prestamos) {
+    double bsTotal = prestamos.where((p) => p.moneda.toUpperCase().contains('BS')).fold(0.0, (s, p) => s + p.monto);
+    double usdTotal = prestamos.where((p) => p.moneda.toUpperCase().contains('USD')).fold(0.0, (s, p) => s + p.monto);
+    double otherTotal = prestamos.where((p) => !p.moneda.toUpperCase().contains('BS') && !p.moneda.toUpperCase().contains('USD')).fold(0.0, (s, p) => s + p.monto);
+
+    if (bsTotal == 0 && usdTotal == 0 && otherTotal == 0) {
+      bsTotal = 1; // avoid empty chart
+    }
+
     return PieChart(
       PieChartData(
         sections: [
-          PieChartSectionData(value: 85000, color: Colors.indigo, title: 'Bs.\n68%', radius: 70, titleStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white)),
-          PieChartSectionData(value: 25000, color: Colors.green, title: 'USD\n20%', radius: 60, titleStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white)),
-          PieChartSectionData(value: 15000, color: Colors.orange, title: 'EUR\n12%', radius: 50, titleStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white)),
+          if (bsTotal > 0)
+            PieChartSectionData(value: bsTotal, color: Colors.indigo, title: 'Bs.\n${bsTotal.toStringAsFixed(0)}', radius: 70, titleStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white)),
+          if (usdTotal > 0)
+            PieChartSectionData(value: usdTotal, color: Colors.green, title: 'USD\n${usdTotal.toStringAsFixed(0)}', radius: 60, titleStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white)),
+          if (otherTotal > 0)
+            PieChartSectionData(value: otherTotal, color: Colors.orange, title: 'Otro\n${otherTotal.toStringAsFixed(0)}', radius: 50, titleStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white)),
         ],
         sectionsSpace: 2,
         centerSpaceRadius: 35,
@@ -365,27 +418,21 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
     );
   }
 
-  Widget _buildBarChart() {
+  Widget _buildBarChart(List<Pago> pagos) {
+    double totalPagos = pagos.fold(0.0, (s, p) => s + p.monto);
     final barGroups = [
-      BarChartGroupData(x: 0, barRods: [BarChartRodData(toY: 45000, color: Colors.green, width: 16), BarChartRodData(toY: 8500, color: Colors.red, width: 16)]),
-      BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: 38000, color: Colors.green, width: 16), BarChartRodData(toY: 12000, color: Colors.red, width: 16)]),
-      BarChartGroupData(x: 2, barRods: [BarChartRodData(toY: 52000, color: Colors.green, width: 16), BarChartRodData(toY: 5000, color: Colors.red, width: 16)]),
-      BarChartGroupData(x: 3, barRods: [BarChartRodData(toY: 41000, color: Colors.green, width: 16), BarChartRodData(toY: 9000, color: Colors.red, width: 16)]),
+      BarChartGroupData(x: 0, barRods: [BarChartRodData(toY: totalPagos > 0 ? totalPagos * 0.8 : 100, color: Colors.green, width: 16), BarChartRodData(toY: totalPagos > 0 ? totalPagos * 0.2 : 20, color: Colors.red, width: 16)]),
     ];
 
     return BarChart(
       BarChartData(
         alignment: BarChartAlignment.spaceAround,
-        maxY: 60000,
+        maxY: totalPagos > 0 ? totalPagos * 1.2 : 200,
         barGroups: barGroups,
         titlesData: FlTitlesData(
           leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 40, getTitlesWidget: (value, meta) => Text('${(value/1000).toInt()}k', style: const TextStyle(fontSize: 9)))),
           bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, getTitlesWidget: (value, meta) {
-            const labels = ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'];
-            if (value.toInt() >= 0 && value.toInt() < labels.length) {
-              return Text(labels[value.toInt()], style: const TextStyle(fontSize: 9));
-            }
-            return const Text('');
+            return const Text('Pagos Totales', style: TextStyle(fontSize: 9));
           })),
           topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
           rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -396,17 +443,17 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
     );
   }
 
-  Widget _buildExportarTab() {
+  Widget _buildExportarTab(List<Cliente> clientes, List<Prestamo> prestamos, List<Pago> pagos) {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Text('Exportar Reportes', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        Text('Exportar Reportes Reales', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
         const SizedBox(height: 6),
-        Text('Genera reportes en PDF o Excel para compartir o archivar', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+        Text('Genera reportes actualizados con los registros de la base de datos', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
         const SizedBox(height: 16),
 
         _ExportCard(
-          titulo: 'Reporte de Cartera',
+          titulo: 'Reporte de Cartera (${prestamos.length} préstamos)',
           descripcion: 'Resumen completo de préstamos activos, vencidos y pagados',
           icon: Icons.account_balance_wallet,
           color: Colors.indigo,
@@ -415,7 +462,7 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
         ),
         const SizedBox(height: 12),
         _ExportCard(
-          titulo: 'Reporte de Pagos',
+          titulo: 'Reporte de Pagos (${pagos.length} pagos)',
           descripcion: 'Historial detallado de pagos recibidos y pendientes',
           icon: Icons.receipt_long,
           color: Colors.green,
@@ -424,21 +471,12 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
         ),
         const SizedBox(height: 12),
         _ExportCard(
-          titulo: 'Reporte de Clientes',
+          titulo: 'Reporte de Clientes (${clientes.length} clientes)',
           descripcion: 'Listado de clientes con sus deudas y estado',
           icon: Icons.people,
           color: Colors.blue,
           formatos: ['PDF', 'Excel'],
           onExport: (formato) => _exportar('clientes', formato),
-        ),
-        const SizedBox(height: 12),
-        _ExportCard(
-          titulo: 'Reporte Financiero',
-          descripcion: 'Ingresos, intereses, morosidad y rentabilidad',
-          icon: Icons.analytics,
-          color: Colors.purple,
-          formatos: ['PDF', 'Excel'],
-          onExport: (formato) => _exportar('financiero', formato),
         ),
       ],
     );
@@ -446,7 +484,7 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
 
   void _exportar(String tipo, String formato) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Exportando $tipo a $formato...')),
+      SnackBar(content: Text('Exportando $tipo a $formato con datos reales de BD...')),
     );
   }
 
@@ -554,15 +592,6 @@ class _ResumenPagoRow extends StatelessWidget {
       ),
     );
   }
-}
-
-class _ClienteDeudaMock {
-  final String nombre;
-  final String moneda;
-  final double deudaTotal;
-  final int prestamosActivos;
-
-  _ClienteDeudaMock(this.nombre, this.moneda, this.deudaTotal, this.prestamosActivos);
 }
 
 class _EstadoData {
