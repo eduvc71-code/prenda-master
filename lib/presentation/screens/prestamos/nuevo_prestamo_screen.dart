@@ -164,6 +164,7 @@ class _NuevoPrestamoScreenState extends ConsumerState<NuevoPrestamoScreen> {
         fechaInicio: Value(fechaInicio),
         fechaVencimiento: Value(fechaInicio.add(Duration(days: plazo))),
         estado: Value('Activo'),
+        descripcion: Value(_descripcionController.text.trim().isNotEmpty ? _descripcionController.text.trim() : 'Préstamo de garantía'),
       ));
 
       if (_photoPath.isNotEmpty) {

@@ -108,7 +108,7 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // KPIs principales (2 rows of 2 cards to prevent any right-overflow)
+          // KPIs principales (2 rows of 2 cards to prevent right-overflow)
           Text('Indicadores Clave', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           _buildKPIRow([
@@ -154,13 +154,13 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
           ),
           const SizedBox(height: 16),
 
-          // Top clientes por deuda
-          Text('Top 5 clientes por deuda', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+          // Top clientes por deuda (comprimido a Top 3 para visibilidad)
+          Text('Top Clientes por Deuda', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           _buildTopClientesDeuda(),
           const SizedBox(height: 16),
 
-          // Préstamos por estado (reducidos y compactos)
+          // Préstamos por estado (visible inmediatamente)
           Text('Préstamos por estado', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           _buildPrestamosPorEstado(resumen),
@@ -185,8 +185,6 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
       _ClienteDeudaMock('Juan Pérez', 'Bs.', 8500, 2),
       _ClienteDeudaMock('María García', 'Bs.', 12000, 1),
       _ClienteDeudaMock('Carlos López', 'Bs.', 3000, 1),
-      _ClienteDeudaMock('Ana Martínez', 'Bs.', 3000, 1),
-      _ClienteDeudaMock('Pedro Sánchez', 'Bs.', 2000, 1),
     ];
 
     return Card(
@@ -200,19 +198,20 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
           final c = topClientes[index];
           return ListTile(
             dense: true,
+            visualDensity: const VisualDensity(vertical: -3),
             leading: CircleAvatar(
-              radius: 14,
+              radius: 12,
               backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-              child: Text('${index + 1}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Theme.of(context).colorScheme.onPrimaryContainer)),
+              child: Text('${index + 1}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: Theme.of(context).colorScheme.onPrimaryContainer)),
             ),
-            title: Text(c.nombre, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 12)),
-            subtitle: Text('${c.prestamosActivos} activos', style: const TextStyle(fontSize: 10)),
+            title: Text(c.nombre, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 11)),
+            subtitle: Text('${c.prestamosActivos} activos', style: const TextStyle(fontSize: 9)),
             trailing: Text(
               '${c.moneda} ${_formatNumber(c.deudaTotal)}',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.primary,
-                fontSize: 13,
+                fontSize: 12,
               ),
             ),
           );
@@ -511,19 +510,19 @@ class _KPICard extends StatelessWidget {
     return Card(
       margin: EdgeInsets.zero,
       child: Padding(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(color: data.color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
-              child: Icon(data.icon, color: data.color, size: 16),
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(color: data.color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
+              child: Icon(data.icon, color: data.color, size: 14),
             ),
-            const SizedBox(height: 8),
-            Text(data.value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black87)),
+            const SizedBox(height: 6),
+            Text(data.value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.black87)),
             const SizedBox(height: 2),
-            Text(data.label, style: TextStyle(fontSize: 10, color: Colors.grey.shade600), maxLines: 1, overflow: TextOverflow.ellipsis),
+            Text(data.label, style: TextStyle(fontSize: 9, color: Colors.grey.shade600), maxLines: 1, overflow: TextOverflow.ellipsis),
           ],
         ),
       ),
@@ -543,14 +542,14 @@ class _ResumenPagoRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: color),
-          const SizedBox(width: 8),
-          Text(label, style: TextStyle(fontSize: isTotal ? 13 : 12, fontWeight: isTotal ? FontWeight.bold : FontWeight.normal)),
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 6),
+          Text(label, style: TextStyle(fontSize: isTotal ? 12 : 11, fontWeight: isTotal ? FontWeight.bold : FontWeight.normal)),
           const Spacer(),
-          Text(amount, style: TextStyle(fontSize: isTotal ? 14 : 12, fontWeight: FontWeight.bold, color: color)),
+          Text(amount, style: TextStyle(fontSize: isTotal ? 13 : 11, fontWeight: FontWeight.bold, color: color)),
         ],
       ),
     );
@@ -596,26 +595,26 @@ class _ExportCard extends StatelessWidget {
     return Card(
       margin: EdgeInsets.zero,
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(10),
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
-              child: Icon(icon, color: color, size: 24),
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
+              child: Icon(icon, color: color, size: 20),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(titulo, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  Text(titulo, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                   const SizedBox(height: 2),
-                  Text(descripcion, style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
+                  Text(descripcion, style: TextStyle(fontSize: 9, color: Colors.grey.shade600)),
                 ],
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 6),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: formatos.map((f) => Padding(
@@ -623,11 +622,11 @@ class _ExportCard extends StatelessWidget {
                 child: OutlinedButton(
                   onPressed: () => onExport(f),
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
-                  child: Text(f, style: const TextStyle(fontSize: 10)),
+                  child: Text(f, style: const TextStyle(fontSize: 9)),
                 ),
               )).toList(),
             ),

@@ -53,35 +53,47 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             title: 'Prenda-Master',
             subtitle: 'Panel de Control',
             actions: [
-              InkWell(
-                onTap: () {
-                  print('Search pressed');
-                },
-                borderRadius: BorderRadius.circular(8),
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Icon(
-                    Icons.search_rounded,
-                    size: 24,
-                    color: Colors.grey.shade700,
-                  ),
-                ),
-              ),
-              InkWell(
-                onTap: () {
-                  SystemNavigator.pop();
-                },
-                borderRadius: BorderRadius.circular(8),
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Icon(
-                    Icons.exit_to_app_rounded,
-                    size: 24,
-                    color: Colors.red.shade700,
-                  ),
-                ),
-              ),
-            ],
+                          InkWell(
+                            onTap: () {
+                              print('Search pressed');
+                            },
+                            borderRadius: BorderRadius.circular(8),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Icon(
+                                Icons.search_rounded,
+                                size: 24,
+                                color: Colors.grey.shade700,
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () => context.go(AppConstants.routeBackup),
+                            borderRadius: BorderRadius.circular(8),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Icon(
+                                Icons.settings_rounded,
+                                size: 24,
+                                color: Colors.grey.shade700,
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              SystemNavigator.pop();
+                            },
+                            borderRadius: BorderRadius.circular(8),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Icon(
+                                Icons.exit_to_app_rounded,
+                                size: 24,
+                                color: Colors.red.shade700,
+                              ),
+                            ),
+                          ),
+                        ],
           ),
           
           Expanded(
