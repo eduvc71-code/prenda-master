@@ -5,6 +5,8 @@ import 'package:prenda_master/core/constants/app_constants.dart';
 import 'package:prenda_master/presentation/widgets/custom_header.dart';
 import 'package:prenda_master/presentation/widgets/filter_chip_group.dart';
 import 'package:prenda_master/presentation/widgets/loan_card.dart';
+import 'package:prenda_master/providers/database_providers.dart';
+import 'package:prenda_master/data/app_database.dart';
 
 class PrestamosScreen extends ConsumerStatefulWidget {
   const PrestamosScreen({super.key});
@@ -19,15 +21,8 @@ class _PrestamosScreenState extends ConsumerState<PrestamosScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
-    // Datos mock para demostración
-    final prestamosMock = [
-      {'number': 1001, 'client': 'Juan Pérez', 'amount': 1500.0, 'status': 'Activo', 'dueDate': DateTime.now().add(const Duration(days: 15))},
-      {'number': 1002, 'client': 'María García', 'amount': 800.0, 'status': 'Vencido', 'dueDate': DateTime.now().subtract(const Duration(days: 5))},
-      {'number': 1003, 'client': 'Carlos López', 'amount': 2400.0, 'status': 'Activo', 'dueDate': DateTime.now().add(const Duration(days: 30))},
-      {'number': 1004, 'client': 'Ana Martínez', 'amount': 500.0, 'status': 'Pagado', 'dueDate': DateTime.now().subtract(const Duration(days: 10))},
-      {'number': 1005, 'client': 'Pedro Sánchez', 'amount': 3000.0, 'status': 'Pendiente', 'dueDate': DateTime.now().add(const Duration(days: 7))},
-    ];
+    final prestamosAsync = ref.watch(prestamosProvider);
+    final clientesAsync = ref.watch(clientesProvider);
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
@@ -72,7 +67,6 @@ class _PrestamosScreenState extends ConsumerState<PrestamosScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: 16),
-                  // Filtros
                   FilterChipGroup(
                     options: ['Todos', 'Activos', 'Vencidos', 'Pendientes', 'Pagados'],
                     selectedOption: _selectedFilter,
@@ -87,23 +81,63 @@ class _PrestamosScreenState extends ConsumerState<PrestamosScreen> {
             ),
           ),
           
-          // Lista de préstamos
+          // Lista de préstamos real desde Base de Datos
           Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.all(24),
-              itemCount: prestamosMock.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
-              itemBuilder: (context, index) {
-                final prestamo = prestamosMock[index];
-                return LoanCard(
-                  loanNumber: prestamo['number'] as int,
-                  clientName: prestamo['client'] as String,
-                  amount: prestamo['amount'] as double,
-                  currency: 'Bs.',
-                  status: prestamo['status'] as String,
-                  dueDate: prestamo['dueDate'] as DateTime,
-                  onTap: () {
-                    print('Préstamo seleccionado: #${prestamo['number']}');
+            child: prestamosAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, stack) => Center(child: Text('Error: $err')),
+              data: (prestamos) {
+                final clientesMap = <int, Cliente>{};
+                clientesAsync.maybeWhen(
+                  data: (clientes) {
+                    for (var c in clientes) {
+                      clientesMap[c.id] = c;
+                    }
+                  },
+                  orElse: () {},
+                );
+
+                final filtrados = prestamos.where((p) {
+                  if (_selectedFilter == 'Todos') return true;
+                  if (_selectedFilter == 'Activos' && p.estado.toLowerCase() == 'activo') return true;
+                  if (_selectedFilter == 'Vencidos' && p.estado.toLowerCase() == 'vencido') return true;
+                  if (_selectedFilter == 'Pendientes' && p.estado.toLowerCase() == 'pendiente') return true;
+                  if (_selectedFilter == 'Pagados' && p.estado.toLowerCase() == 'pagado') return true;
+                  return false;
+                }).toList();
+
+                if (filtrados.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.folder_open_rounded, size: 64, color: Colors.grey.shade400),
+                        const SizedBox(height: 12),
+                        const Text('No hay préstamos en esta categoría', style: TextStyle(color: Colors.grey)),
+                      ],
+                    ),
+                  );
+                }
+
+                return ListView.separated(
+                  padding: const EdgeInsets.all(24),
+                  itemCount: filtrados.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  itemBuilder: (context, index) {
+                    final p = filtrados[index];
+                    final cliente = clientesMap[p.clienteId];
+                    final clientName = cliente != null ? '${cliente.nombre} ${cliente.apellido}' : 'Cliente #${p.clienteId}';
+                    return LoanCard(
+                      loanNumber: p.id,
+                      clientName: clientName,
+                      amount: p.monto,
+                      currency: p.moneda,
+                      status: p.estado,
+                      dueDate: p.fechaVencimiento,
+                      onTap: () {
+                        print('Préstamo seleccionado: #${p.id}');
+                      },
+                    );
                   },
                 );
               },

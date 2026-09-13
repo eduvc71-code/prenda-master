@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:prenda_master/core/constants/app_constants.dart';
 import 'package:prenda_master/services/auth_service.dart';
 import 'package:prenda_master/services/backup_service.dart';
+import 'package:prenda_master/providers/database_providers.dart';
 
 final appSettingsStorageProvider = Provider<FlutterSecureStorage>((ref) => const FlutterSecureStorage());
 
@@ -75,6 +76,44 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
               }
             },
             child: const Text('Guardar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showClearDatabaseConfirmation() async {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('¿Vaciar Base de Datos?'),
+        content: const Text('Esta acción eliminará permanentemente todos los clientes, préstamos, prendas y pagos registrados. ¿Desea continuar?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+            onPressed: () async {
+              Navigator.pop(context);
+              setState(() => _isLoading = true);
+              try {
+                final db = ref.read(databaseProvider);
+                await db.clearAllTables();
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('¡Base de datos vaciada con éxito!')),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error al vaciar base de datos: $e')),
+                  );
+                }
+              } finally {
+                if (mounted) setState(() => _isLoading = false);
+              }
+            },
+            child: const Text('Vaciar Todo'),
           ),
         ],
       ),
@@ -380,11 +419,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
                           ),
                           const SizedBox(height: 12),
                           OutlinedButton.icon(
-                            onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Acción protegida en modo demo')),
-                              );
-                            },
+                            onPressed: _showClearDatabaseConfirmation,
                             icon: const Icon(Icons.delete_forever, color: Colors.red, size: 16),
                             label: const Text('Limpiar Base de Datos', style: TextStyle(color: Colors.red, fontSize: 12)),
                             style: OutlinedButton.styleFrom(

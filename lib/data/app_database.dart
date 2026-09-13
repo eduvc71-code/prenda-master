@@ -37,7 +37,7 @@ class Prestamos extends Table {
   DateTimeColumn get fechaInicio => dateTime()();
   DateTimeColumn get fechaVencimiento => dateTime()();
   TextColumn get estado => text().withLength(min: 1, max: 20)();
-  TextColumn get descripcion => text().withLength(min: 0, max: 500)(); // Agregado
+  TextColumn get descripcion => text().withLength(min: 0, max: 500)();
   DateTimeColumn get creadoEn => dateTime().withDefault(currentDateAndTime)();
 }
 
@@ -58,6 +58,110 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   int get schemaVersion => 1;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (Migrator m) async {
+          await m.createAll();
+          // Seed sample initial data so the app has realistic records immediately
+          final c1 = await into(clientes).insert(ClientesCompanion.insert(
+            nombre: 'Juan',
+            apellido: 'Pérez',
+            cedula: '3455652',
+            telefono: '70123456',
+            email: 'juan.perez@email.com',
+            direccion: 'Santa Rosa del Yacuma',
+          ));
+          final c2 = await into(clientes).insert(ClientesCompanion.insert(
+            nombre: 'María',
+            apellido: 'García',
+            cedula: '4567891',
+            telefono: '71234567',
+            email: 'maria.garcia@email.com',
+            direccion: 'La Paz',
+          ));
+          final c3 = await into(clientes).insert(ClientesCompanion.insert(
+            nombre: 'Carlos',
+            apellido: 'López',
+            cedula: '5678912',
+            telefono: '72345678',
+            email: 'carlos.lopez@email.com',
+            direccion: 'Cochabamba',
+          ));
+          final c4 = await into(clientes).insert(ClientesCompanion.insert(
+            nombre: 'Ana',
+            apellido: 'Martínez',
+            cedula: '6789123',
+            telefono: '73456789',
+            email: 'ana.martinez@email.com',
+            direccion: 'Santa Cruz',
+          ));
+          final c5 = await into(clientes).insert(ClientesCompanion.insert(
+            nombre: 'Pedro',
+            apellido: 'Sánchez',
+            cedula: '7891234',
+            telefono: '74567890',
+            email: 'pedro.sanchez@email.com',
+            direccion: 'Oruro',
+          ));
+
+          await into(prestamos).insert(PrestamosCompanion.insert(
+            clienteId: c1,
+            monto: 1500.0,
+            moneda: 'Bs.',
+            interesMensual: 3.0,
+            plazoDias: 30,
+            fechaInicio: DateTime.now().subtract(const Duration(days: 15)),
+            fechaVencimiento: DateTime.now().add(const Duration(days: 15)),
+            estado: 'Activo',
+            descripcion: '[Joyas (Oro/Plata)] Anillo de oro 18k',
+          ));
+          await into(prestamos).insert(PrestamosCompanion.insert(
+            clienteId: c2,
+            monto: 800.0,
+            moneda: 'Bs.',
+            interesMensual: 3.0,
+            plazoDias: 30,
+            fechaInicio: DateTime.now().subtract(const Duration(days: 35)),
+            fechaVencimiento: DateTime.now().subtract(const Duration(days: 5)),
+            estado: 'Vencido',
+            descripcion: '[Electrónica / Celulares] Smartphone Samsung Galaxy',
+          ));
+          await into(prestamos).insert(PrestamosCompanion.insert(
+            clienteId: c3,
+            monto: 2400.0,
+            moneda: 'Bs.',
+            interesMensual: 3.0,
+            plazoDias: 30,
+            fechaInicio: DateTime.now(),
+            fechaVencimiento: DateTime.now().add(const Duration(days: 30)),
+            estado: 'Activo',
+            descripcion: '[Relojes] Reloj Rolex Submariner',
+          ));
+          await into(prestamos).insert(PrestamosCompanion.insert(
+            clienteId: c4,
+            monto: 500.0,
+            moneda: 'Bs.',
+            interesMensual: 3.0,
+            plazoDias: 30,
+            fechaInicio: DateTime.now().subtract(const Duration(days: 40)),
+            fechaVencimiento: DateTime.now().subtract(const Duration(days: 10)),
+            estado: 'Pagado',
+            descripcion: '[Herramientas] Taladro Bosch profesional',
+          ));
+          await into(prestamos).insert(PrestamosCompanion.insert(
+            clienteId: c5,
+            monto: 3000.0,
+            moneda: 'Bs.',
+            interesMensual: 3.0,
+            plazoDias: 30,
+            fechaInicio: DateTime.now().subtract(const Duration(days: 23)),
+            fechaVencimiento: DateTime.now().add(const Duration(days: 7)),
+            estado: 'Pendiente',
+            descripcion: '[Electrodomésticos] Televisor LG 55 pulgadas',
+          ));
+        },
+      );
 
   // Helper methods for CRUD operations (clients)
   Future<List<Cliente>> getAllClientes() => select(clientes).get();
@@ -91,6 +195,16 @@ class AppDatabase extends _$AppDatabase {
   Future<List<Pago>> getPagosByPrestamo(int prestamoId) =>
       (select(pagos)..where((p) => p.prestamoId.equals(prestamoId))).get();
   Future<int> insertPago(PagosCompanion pago) => into(pagos).insert(pago);
+
+  // Clear / Vaciar Base de Datos
+  Future<void> clearAllTables() async {
+    await transaction(() async {
+      await delete(pagos).go();
+      await delete(prendas).go();
+      await delete(prestamos).go();
+      await delete(clientes).go();
+    });
+  }
 }
 
 // Part 3: Open the database (native for mobile, lazy)
