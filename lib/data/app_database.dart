@@ -65,7 +65,7 @@ class AppDatabase extends _$AppDatabase {
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (Migrator m) async {
           await m.createAll();
-          // Seed sample initial data with diverse loan states (>61 days moroso, 75-90 days recuperacion, >90 days remate)
+          // Seed sample initial data with diverse loan states (including 89 days overdue -> tomorrow 90 days)
           final c1 = await into(clientes).insert(ClientesCompanion.insert(
             nombre: 'Juan',
             apellido: 'Pérez',
@@ -105,6 +105,14 @@ class AppDatabase extends _$AppDatabase {
             telefono: '74567890',
             email: 'pedro.sanchez@email.com',
             direccion: 'Oruro',
+          ));
+          final c6 = await into(clientes).insert(ClientesCompanion.insert(
+            nombre: 'Roberto',
+            apellido: 'Gómez',
+            cedula: '8901234',
+            telefono: '75678901',
+            email: 'roberto.gomez@email.com',
+            direccion: 'Trinidad',
           ));
 
           final p1 = await into(prestamos).insert(PrestamosCompanion.insert(
@@ -170,6 +178,19 @@ class AppDatabase extends _$AppDatabase {
             descripcion: '[Electrodomésticos] Televisor LG 55 pulgadas',
           ));
 
+          // Roberto Gómez: 89 days overdue -> Mañana cumplirá 90 días (Límite exacto de recuperación)
+          await into(prestamos).insert(PrestamosCompanion.insert(
+            clienteId: c6,
+            monto: 4000.0,
+            moneda: 'Bs.',
+            interesMensual: 3.0,
+            plazoDias: 30,
+            fechaInicio: DateTime.now().subtract(const Duration(days: 119)),
+            fechaVencimiento: DateTime.now().subtract(const Duration(days: 89)),
+            estado: 'Vencido',
+            descripcion: '[Vehículos / Motos] Motocicleta Honda 150cc',
+          ));
+
           // Seed sample payments
           await into(pagos).insert(PagosCompanion.insert(
             prestamoId: p4,
@@ -212,7 +233,7 @@ class AppDatabase extends _$AppDatabase {
   Future<List<Prenda>> getPrendasByPrestamo(int prestamoId) =>
       (select(prendas)..where((p) => p.prestamoId.equals(prestamoId))).get();
   Future<int> insertPrenda(PrendasCompanion prenda) => into(prendas).insert(prenda);
-  Future<int> deletePrenda(int id) => (delete(prendas)..where((p) => p.id.equals(id))).go();
+  Future<int> deletePrenda(int id) => (delete(prendas)..where((p) => p.prestamoId.equals(id))).go();
 
   // Helper methods for prestamos by cliente
   Future<List<Prestamo>> getPrestamosByClienteId(int clienteId) =>

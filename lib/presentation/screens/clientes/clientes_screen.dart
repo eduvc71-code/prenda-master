@@ -56,10 +56,10 @@ class _ClientesScreenState extends ConsumerState<ClientesScreen> {
       body: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
-          // Header personalizado con flecha atrás funcional
+          // Header limpio sin la palabra "Reales"
           CustomHeader(
-            title: 'Clientes Reales',
-            subtitle: 'Gestión y estado de clientes en BD',
+            title: 'Clientes',
+            subtitle: 'Gestión de clientes y contactos',
             onLeadingPressed: () {
               if (context.canPop()) {
                 context.pop();
