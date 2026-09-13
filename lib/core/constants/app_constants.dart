@@ -1,5 +1,5 @@
 class AppConstants {
-  static const String appName = 'PrendaMaster';
+  static const String appName = 'Prenda-Master';
   static const String appVersion = '1.0.0';
 
   static const Duration splashDuration = Duration(seconds: 2);
@@ -29,8 +29,8 @@ class AppConstants {
   static const String routeReportes = '/reportes';
   static const String routeBackup = '/backup';
 
-  static const List<String> monedas = ['USD', 'MXN', 'EUR', 'COP', 'ARS', 'CLP', 'PEN'];
-  static const String monedaDefault = 'USD';
+  static const List<String> monedas = ['BOLIVIANOS', 'USD', 'MXN', 'EUR', 'COP', 'ARS', 'CLP', 'PEN'];
+  static const String monedaDefault = 'BOLIVIANOS';
 
   static const double interesMensualDefault = 0.03; // 3% mensual
   static const int diasVencimientoDefault = 30;

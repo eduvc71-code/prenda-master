@@ -44,7 +44,7 @@ class CustomTextField extends StatelessWidget {
             fontWeight: FontWeight.w500,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 4),
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
@@ -89,7 +89,7 @@ class CustomTextField extends StatelessWidget {
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
-              vertical: 16,
+              vertical: 10,
             ),
           ),
         ),

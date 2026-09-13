@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Widget de tarjeta de cliente según diseño de archivos TXT
+/// Widget de tarjeta de cliente compacto y sin overflow
 class ClientCard extends StatelessWidget {
   final String name;
   final String phone;
@@ -25,59 +25,57 @@ class ClientCard extends StatelessWidget {
     
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(12),
       child: Container(
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: theme.colorScheme.outlineVariant,
             width: 1,
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12),
           child: Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
-                width: 56,
-                height: 56,
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
                   color: theme.colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(28),
+                  borderRadius: BorderRadius.circular(22),
                 ),
                 child: Icon(
                   Icons.person_rounded,
-                  size: 28,
+                  size: 22,
                   color: theme.colorScheme.onPrimaryContainer,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               Expanded(
-                flex: 1,
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       name,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
                         color: theme.colorScheme.onSurface,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 2),
                     Text(
                       phone,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
+                        fontSize: 12,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     if (email != null && email!.isNotEmpty) ...[
                       const SizedBox(height: 2),
@@ -85,85 +83,52 @@ class ClientCard extends StatelessWidget {
                         email!,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
-                          fontSize: 12,
+                          fontSize: 11,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
-                    const SizedBox(height: 8),
-                    Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                    const SizedBox(height: 6),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
                       children: [
                         Container(
-                          padding: const EdgeInsetsDirectional.fromSTEB(8, 4, 8, 4),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: theme.colorScheme.secondaryContainer.withOpacity(0.3),
-                            borderRadius: BorderRadius.circular(6),
+                            color: theme.colorScheme.secondaryContainer.withValues(alpha: 0.3),
+                            borderRadius: BorderRadius.circular(4),
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.account_balance_wallet_outlined,
-                                size: 14,
-                                color: theme.colorScheme.secondary,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                '$activeLoans préstamos',
-                                style: theme.textTheme.labelSmall?.copyWith(
-                                  color: theme.colorScheme.onSecondaryContainer,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
+                          child: Text(
+                            '$activeLoans préstamos',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.onSecondaryContainer,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
-                        if (totalDebt > 0) ...[
-                          const SizedBox(width: 8),
+                        if (totalDebt > 0)
                           Container(
-                            padding: const EdgeInsetsDirectional.fromSTEB(8, 4, 8, 4),
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.errorContainer.withOpacity(0.3),
-                              borderRadius: BorderRadius.circular(6),
+                              color: theme.colorScheme.errorContainer.withValues(alpha: 0.3),
+                              borderRadius: BorderRadius.circular(4),
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.trending_up_rounded,
-                                  size: 14,
-                                  color: theme.colorScheme.error,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'Bs ${totalDebt.toStringAsFixed(2)}',
-                                  style: theme.textTheme.labelSmall?.copyWith(
-                                    color: theme.colorScheme.onErrorContainer,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
+                            child: Text(
+                              'Bs ${totalDebt.toStringAsFixed(2)}',
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: theme.colorScheme.onErrorContainer,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
-                        ],
                       ],
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(width: 12),
-              Icon(
-                Icons.chevron_right_rounded,
-                color: theme.colorScheme.onSurfaceVariant,
-                size: 24,
               ),
             ],
           ),

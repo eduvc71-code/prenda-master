@@ -24,7 +24,7 @@ class CustomBottomNavBar extends StatelessWidget {
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -74,31 +74,32 @@ class CustomBottomNavBar extends StatelessWidget {
     final isSelected = currentIndex == index;
     return InkWell(
       onTap: () => onTap(index),
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(8),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
         decoration: BoxDecoration(
-          color: isSelected ? Theme.of(context).colorScheme.primary.withOpacity(0.1) : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
+          color: isSelected ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1) : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               icon,
-              size: 24,
+              size: 20,
               color: isSelected
                   ? Theme.of(context).colorScheme.primary
                   : Colors.grey.shade400,
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Text(
               label,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    fontSize: 10,
                     color: isSelected
                         ? Theme.of(context).colorScheme.primary
-                        : Colors.grey.shade400,
+                        : Colors.grey.shade600,
                   ),
             ),
           ],

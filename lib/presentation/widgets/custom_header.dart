@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:prenda_master/core/constants/app_constants.dart';
 
 /// Widget de AppBar personalizado según diseño de archivos TXT
 class CustomHeader extends StatelessWidget {
@@ -44,14 +46,24 @@ class CustomHeader extends StatelessWidget {
                   children: [
                     if (leading != null || onLeadingPressed != null) ...[
                       InkWell(
-                        onTap: onLeadingPressed ?? () => Navigator.pop(context),
+                        onTap: onLeadingPressed ?? () {
+                          if (context.canPop()) {
+                            context.pop();
+                          } else {
+                            context.go(AppConstants.routeHome);
+                          }
+                        },
                         borderRadius: BorderRadius.circular(8),
                         child: Container(
                           padding: const EdgeInsets.all(8),
-                          child: leading ?? Icon(
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
                             Icons.arrow_back_rounded,
                             size: 24,
-                            color: theme.colorScheme.onSurfaceVariant,
+                            color: theme.colorScheme.onSurface,
                           ),
                         ),
                       ),
@@ -59,21 +71,20 @@ class CustomHeader extends StatelessWidget {
                     ],
                     Column(
                       mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           title,
-                          style: theme.textTheme.headlineMedium?.copyWith(
+                          style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: theme.colorScheme.onSurface,
                           ),
                         ),
                         if (subtitle != null) ...[
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 2),
                           Text(
                             subtitle!,
-                            style: theme.textTheme.bodySmall?.copyWith(
+                            style: theme.textTheme.labelSmall?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
@@ -82,7 +93,12 @@ class CustomHeader extends StatelessWidget {
                     ),
                   ],
                 ),
-                if (actions != null) ...actions!,
+                if (actions != null) ...[
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: actions!,
+                  ),
+                ],
               ],
             ),
           ],

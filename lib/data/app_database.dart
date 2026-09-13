@@ -12,6 +12,7 @@ class Clientes extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get nombre => text().withLength(min: 1, max: 100)();
   TextColumn get apellido => text().withLength(min: 1, max: 100)();
+  TextColumn get cedula => text().withLength(min: 0, max: 50)();
   TextColumn get telefono => text().withLength(min: 1, max: 20)();
   TextColumn get email => text().withLength(min: 0, max: 100)();
   TextColumn get direccion => text().withLength(min: 0, max: 200)();

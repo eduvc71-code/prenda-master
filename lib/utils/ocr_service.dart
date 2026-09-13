@@ -8,10 +8,14 @@ class OcrService {
     final inputImage = InputImage.fromFilePath(imagePath);
     final RecognizedText recognizedText =
         await _textRecognizer.processImage(inputImage);
+    
+    print('=== RAW OCR RECOGNIZED TEXT ===');
+    print(recognizedText.text);
+    print('===============================');
+    
     return recognizedText.text;
   }
 
-  // Optional: Preprocess image if needed
   Uint8List preprocessImage(Uint8List imageBytes) {
     return imageBytes;
   }

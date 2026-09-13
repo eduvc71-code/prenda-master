@@ -15,7 +15,7 @@ class LoanCard extends StatelessWidget {
     required this.loanNumber,
     required this.clientName,
     required this.amount,
-    this.currency = 'Bs',
+    this.currency = 'Bs.',
     required this.status,
     required this.dueDate,
     this.onTap,
@@ -30,18 +30,22 @@ class LoanCard extends StatelessWidget {
     
     switch (status.toLowerCase()) {
       case 'activo':
+      case 'activos':
         statusColor = Colors.green;
         statusIcon = Icons.check_circle_outline_rounded;
         break;
       case 'vencido':
+      case 'vencidos':
         statusColor = Colors.red;
         statusIcon = Icons.error_outline_rounded;
         break;
       case 'pendiente':
+      case 'pendientes':
         statusColor = Colors.orange;
         statusIcon = Icons.schedule_rounded;
         break;
       case 'pagado':
+      case 'pagados':
         statusColor = Colors.blue;
         statusIcon = Icons.verified_rounded;
         break;
@@ -74,52 +78,59 @@ class LoanCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primaryContainer,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(
-                          Icons.account_balance_outlined,
-                          size: 24,
-                          color: theme.colorScheme.primary,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Préstamo #$loanNumber',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: theme.colorScheme.onSurface,
-                            ),
+                  Expanded(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 42,
+                          height: 42,
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            clientName,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
+                          child: Icon(
+                            Icons.account_balance_outlined,
+                            size: 22,
+                            color: theme.colorScheme.primary,
                           ),
-                        ],
-                      ),
-                    ],
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Préstamo #$loanNumber',
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: theme.colorScheme.onSurface,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                clientName,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                  const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsetsDirectional.fromSTEB(8, 4, 8, 4),
+                    padding: const EdgeInsetsDirectional.fromSTEB(6, 3, 6, 3),
                     decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.1),
+                      color: statusColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Row(
@@ -129,15 +140,19 @@ class LoanCard extends StatelessWidget {
                       children: [
                         Icon(
                           statusIcon,
-                          size: 14,
+                          size: 12,
                           color: statusColor,
                         ),
-                        const SizedBox(width: 4),
-                        Text(
-                          status,
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: statusColor,
-                            fontWeight: FontWeight.w600,
+                        const SizedBox(width: 3),
+                        Flexible(
+                          child: Text(
+                            status,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: statusColor,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 11,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
@@ -145,52 +160,23 @@ class LoanCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               Row(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Monto',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '$currency ${amount.toStringAsFixed(2)}',
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: theme.colorScheme.onSurface,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    'Monto: $currency ${amount.toStringAsFixed(2)}',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.primary,
+                    ),
                   ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        'Vence',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${dueDate.day.toString().padLeft(2, '0')}/${dueDate.month.toString().padLeft(2, '0')}/${dueDate.year}',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurface,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    'Vence: ${dueDate.day}/${dueDate.month}/${dueDate.year}',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),

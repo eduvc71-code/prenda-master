@@ -49,6 +49,19 @@ class $ClientesTable extends Clientes with TableInfo<$ClientesTable, Cliente> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _cedulaMeta = const VerificationMeta('cedula');
+  @override
+  late final GeneratedColumn<String> cedula = GeneratedColumn<String>(
+    'cedula',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 0,
+      maxTextLength: 50,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _telefonoMeta = const VerificationMeta(
     'telefono',
   );
@@ -109,6 +122,7 @@ class $ClientesTable extends Clientes with TableInfo<$ClientesTable, Cliente> {
     id,
     nombre,
     apellido,
+    cedula,
     telefono,
     email,
     direccion,
@@ -144,6 +158,14 @@ class $ClientesTable extends Clientes with TableInfo<$ClientesTable, Cliente> {
       );
     } else if (isInserting) {
       context.missing(_apellidoMeta);
+    }
+    if (data.containsKey('cedula')) {
+      context.handle(
+        _cedulaMeta,
+        cedula.isAcceptableOrUnknown(data['cedula']!, _cedulaMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_cedulaMeta);
     }
     if (data.containsKey('telefono')) {
       context.handle(
@@ -196,6 +218,10 @@ class $ClientesTable extends Clientes with TableInfo<$ClientesTable, Cliente> {
         DriftSqlType.string,
         data['${effectivePrefix}apellido'],
       )!,
+      cedula: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cedula'],
+      )!,
       telefono: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}telefono'],
@@ -225,6 +251,7 @@ class Cliente extends DataClass implements Insertable<Cliente> {
   final int id;
   final String nombre;
   final String apellido;
+  final String cedula;
   final String telefono;
   final String email;
   final String direccion;
@@ -233,6 +260,7 @@ class Cliente extends DataClass implements Insertable<Cliente> {
     required this.id,
     required this.nombre,
     required this.apellido,
+    required this.cedula,
     required this.telefono,
     required this.email,
     required this.direccion,
@@ -244,6 +272,7 @@ class Cliente extends DataClass implements Insertable<Cliente> {
     map['id'] = Variable<int>(id);
     map['nombre'] = Variable<String>(nombre);
     map['apellido'] = Variable<String>(apellido);
+    map['cedula'] = Variable<String>(cedula);
     map['telefono'] = Variable<String>(telefono);
     map['email'] = Variable<String>(email);
     map['direccion'] = Variable<String>(direccion);
@@ -256,6 +285,7 @@ class Cliente extends DataClass implements Insertable<Cliente> {
       id: Value(id),
       nombre: Value(nombre),
       apellido: Value(apellido),
+      cedula: Value(cedula),
       telefono: Value(telefono),
       email: Value(email),
       direccion: Value(direccion),
@@ -272,6 +302,7 @@ class Cliente extends DataClass implements Insertable<Cliente> {
       id: serializer.fromJson<int>(json['id']),
       nombre: serializer.fromJson<String>(json['nombre']),
       apellido: serializer.fromJson<String>(json['apellido']),
+      cedula: serializer.fromJson<String>(json['cedula']),
       telefono: serializer.fromJson<String>(json['telefono']),
       email: serializer.fromJson<String>(json['email']),
       direccion: serializer.fromJson<String>(json['direccion']),
@@ -285,6 +316,7 @@ class Cliente extends DataClass implements Insertable<Cliente> {
       'id': serializer.toJson<int>(id),
       'nombre': serializer.toJson<String>(nombre),
       'apellido': serializer.toJson<String>(apellido),
+      'cedula': serializer.toJson<String>(cedula),
       'telefono': serializer.toJson<String>(telefono),
       'email': serializer.toJson<String>(email),
       'direccion': serializer.toJson<String>(direccion),
@@ -296,6 +328,7 @@ class Cliente extends DataClass implements Insertable<Cliente> {
     int? id,
     String? nombre,
     String? apellido,
+    String? cedula,
     String? telefono,
     String? email,
     String? direccion,
@@ -304,6 +337,7 @@ class Cliente extends DataClass implements Insertable<Cliente> {
     id: id ?? this.id,
     nombre: nombre ?? this.nombre,
     apellido: apellido ?? this.apellido,
+    cedula: cedula ?? this.cedula,
     telefono: telefono ?? this.telefono,
     email: email ?? this.email,
     direccion: direccion ?? this.direccion,
@@ -314,6 +348,7 @@ class Cliente extends DataClass implements Insertable<Cliente> {
       id: data.id.present ? data.id.value : this.id,
       nombre: data.nombre.present ? data.nombre.value : this.nombre,
       apellido: data.apellido.present ? data.apellido.value : this.apellido,
+      cedula: data.cedula.present ? data.cedula.value : this.cedula,
       telefono: data.telefono.present ? data.telefono.value : this.telefono,
       email: data.email.present ? data.email.value : this.email,
       direccion: data.direccion.present ? data.direccion.value : this.direccion,
@@ -327,6 +362,7 @@ class Cliente extends DataClass implements Insertable<Cliente> {
           ..write('id: $id, ')
           ..write('nombre: $nombre, ')
           ..write('apellido: $apellido, ')
+          ..write('cedula: $cedula, ')
           ..write('telefono: $telefono, ')
           ..write('email: $email, ')
           ..write('direccion: $direccion, ')
@@ -336,8 +372,16 @@ class Cliente extends DataClass implements Insertable<Cliente> {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, nombre, apellido, telefono, email, direccion, creadoEn);
+  int get hashCode => Object.hash(
+    id,
+    nombre,
+    apellido,
+    cedula,
+    telefono,
+    email,
+    direccion,
+    creadoEn,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -345,6 +389,7 @@ class Cliente extends DataClass implements Insertable<Cliente> {
           other.id == this.id &&
           other.nombre == this.nombre &&
           other.apellido == this.apellido &&
+          other.cedula == this.cedula &&
           other.telefono == this.telefono &&
           other.email == this.email &&
           other.direccion == this.direccion &&
@@ -355,6 +400,7 @@ class ClientesCompanion extends UpdateCompanion<Cliente> {
   final Value<int> id;
   final Value<String> nombre;
   final Value<String> apellido;
+  final Value<String> cedula;
   final Value<String> telefono;
   final Value<String> email;
   final Value<String> direccion;
@@ -363,6 +409,7 @@ class ClientesCompanion extends UpdateCompanion<Cliente> {
     this.id = const Value.absent(),
     this.nombre = const Value.absent(),
     this.apellido = const Value.absent(),
+    this.cedula = const Value.absent(),
     this.telefono = const Value.absent(),
     this.email = const Value.absent(),
     this.direccion = const Value.absent(),
@@ -372,12 +419,14 @@ class ClientesCompanion extends UpdateCompanion<Cliente> {
     this.id = const Value.absent(),
     required String nombre,
     required String apellido,
+    required String cedula,
     required String telefono,
     required String email,
     required String direccion,
     this.creadoEn = const Value.absent(),
   }) : nombre = Value(nombre),
        apellido = Value(apellido),
+       cedula = Value(cedula),
        telefono = Value(telefono),
        email = Value(email),
        direccion = Value(direccion);
@@ -385,6 +434,7 @@ class ClientesCompanion extends UpdateCompanion<Cliente> {
     Expression<int>? id,
     Expression<String>? nombre,
     Expression<String>? apellido,
+    Expression<String>? cedula,
     Expression<String>? telefono,
     Expression<String>? email,
     Expression<String>? direccion,
@@ -394,6 +444,7 @@ class ClientesCompanion extends UpdateCompanion<Cliente> {
       if (id != null) 'id': id,
       if (nombre != null) 'nombre': nombre,
       if (apellido != null) 'apellido': apellido,
+      if (cedula != null) 'cedula': cedula,
       if (telefono != null) 'telefono': telefono,
       if (email != null) 'email': email,
       if (direccion != null) 'direccion': direccion,
@@ -405,6 +456,7 @@ class ClientesCompanion extends UpdateCompanion<Cliente> {
     Value<int>? id,
     Value<String>? nombre,
     Value<String>? apellido,
+    Value<String>? cedula,
     Value<String>? telefono,
     Value<String>? email,
     Value<String>? direccion,
@@ -414,6 +466,7 @@ class ClientesCompanion extends UpdateCompanion<Cliente> {
       id: id ?? this.id,
       nombre: nombre ?? this.nombre,
       apellido: apellido ?? this.apellido,
+      cedula: cedula ?? this.cedula,
       telefono: telefono ?? this.telefono,
       email: email ?? this.email,
       direccion: direccion ?? this.direccion,
@@ -432,6 +485,9 @@ class ClientesCompanion extends UpdateCompanion<Cliente> {
     }
     if (apellido.present) {
       map['apellido'] = Variable<String>(apellido.value);
+    }
+    if (cedula.present) {
+      map['cedula'] = Variable<String>(cedula.value);
     }
     if (telefono.present) {
       map['telefono'] = Variable<String>(telefono.value);
@@ -454,6 +510,7 @@ class ClientesCompanion extends UpdateCompanion<Cliente> {
           ..write('id: $id, ')
           ..write('nombre: $nombre, ')
           ..write('apellido: $apellido, ')
+          ..write('cedula: $cedula, ')
           ..write('telefono: $telefono, ')
           ..write('email: $email, ')
           ..write('direccion: $direccion, ')
@@ -1930,6 +1987,7 @@ typedef $$ClientesTableCreateCompanionBuilder = ClientesCompanion Function({
   Value<int> id,
   required String nombre,
   required String apellido,
+  required String cedula,
   required String telefono,
   required String email,
   required String direccion,
@@ -1939,6 +1997,7 @@ typedef $$ClientesTableUpdateCompanionBuilder = ClientesCompanion Function({
   Value<int> id,
   Value<String> nombre,
   Value<String> apellido,
+  Value<String> cedula,
   Value<String> telefono,
   Value<String> email,
   Value<String> direccion,
@@ -1989,6 +2048,11 @@ class $$ClientesTableFilterComposer
 
   ColumnFilters<String> get apellido => $composableBuilder(
     column: $table.apellido,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get cedula => $composableBuilder(
+    column: $table.cedula,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2062,6 +2126,11 @@ class $$ClientesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get cedula => $composableBuilder(
+    column: $table.cedula,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get telefono => $composableBuilder(
     column: $table.telefono,
     builder: (column) => ColumnOrderings(column),
@@ -2100,6 +2169,9 @@ class $$ClientesTableAnnotationComposer
 
   GeneratedColumn<String> get apellido =>
       $composableBuilder(column: $table.apellido, builder: (column) => column);
+
+  GeneratedColumn<String> get cedula =>
+      $composableBuilder(column: $table.cedula, builder: (column) => column);
 
   GeneratedColumn<String> get telefono =>
       $composableBuilder(column: $table.telefono, builder: (column) => column);
@@ -2170,6 +2242,7 @@ class $$ClientesTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<String> nombre = const Value.absent(),
                 Value<String> apellido = const Value.absent(),
+                Value<String> cedula = const Value.absent(),
                 Value<String> telefono = const Value.absent(),
                 Value<String> email = const Value.absent(),
                 Value<String> direccion = const Value.absent(),
@@ -2178,6 +2251,7 @@ class $$ClientesTableTableManager
                 id: id,
                 nombre: nombre,
                 apellido: apellido,
+                cedula: cedula,
                 telefono: telefono,
                 email: email,
                 direccion: direccion,
@@ -2188,6 +2262,7 @@ class $$ClientesTableTableManager
                 Value<int> id = const Value.absent(),
                 required String nombre,
                 required String apellido,
+                required String cedula,
                 required String telefono,
                 required String email,
                 required String direccion,
@@ -2196,6 +2271,7 @@ class $$ClientesTableTableManager
                 id: id,
                 nombre: nombre,
                 apellido: apellido,
+                cedula: cedula,
                 telefono: telefono,
                 email: email,
                 direccion: direccion,

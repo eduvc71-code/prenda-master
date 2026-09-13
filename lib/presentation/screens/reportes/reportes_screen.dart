@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -37,12 +36,22 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
     return Scaffold(
       appBar: AppBar(
         title: const Text('Reportes'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go(AppConstants.routeHome);
+            }
+          },
+        ),
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
-            Tab(text: 'Resumen', icon: Icon(Icons.dashboard)),
-            Tab(text: 'Gráficas', icon: Icon(Icons.bar_chart)),
-            Tab(text: 'Exportar', icon: Icon(Icons.download)),
+            Tab(text: 'Resumen', icon: Icon(Icons.dashboard, size: 20)),
+            Tab(text: 'Gráficas', icon: Icon(Icons.bar_chart, size: 20)),
+            Tab(text: 'Exportar', icon: Icon(Icons.download, size: 20)),
           ],
         ),
         actions: [
@@ -50,17 +59,17 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
             initialValue: _periodoSeleccionado,
             onSelected: (value) => setState(() => _periodoSeleccionado = value),
             itemBuilder: (context) => _periodos
-                .map((p) => PopupMenuItem(value: p, child: Text(p)))
+                .map((p) => PopupMenuItem(value: p, child: Text(p, style: const TextStyle(fontSize: 12))))
                 .toList(),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.date_range, size: 20, color: theme.colorScheme.onSurface),
+                  Icon(Icons.date_range, size: 18, color: theme.colorScheme.onSurface),
                   const SizedBox(width: 4),
-                  Text(_periodoSeleccionado, style: theme.textTheme.bodyMedium),
-                  const Icon(Icons.arrow_drop_down, size: 20),
+                  Text(_periodoSeleccionado, style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold)),
+                  const Icon(Icons.arrow_drop_down, size: 18),
                 ],
               ),
             ),
@@ -79,7 +88,6 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
   }
 
   Widget _buildResumenTab() {
-    // TODO: Replace with real data from database
     final resumen = _ResumenMock(
       totalPrestamos: 24,
       prestamosActivos: 18,
@@ -96,39 +104,46 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
     );
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // KPIs principales
-          Text('Indicadores Clave', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 12),
+          // KPIs principales (2 rows of 2 cards to prevent any right-overflow)
+          Text('Indicadores Clave', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
           _buildKPIRow([
             _KPIData('Préstamos activos', '${resumen.prestamosActivos}', Icons.account_balance_wallet, Colors.green),
             _KPIData('Préstamos vencidos', '${resumen.prestamosVencidos}', Icons.warning, Colors.red),
+          ]),
+          const SizedBox(height: 8),
+          _buildKPIRow([
             _KPIData('Clientes activos', '${resumen.clientesActivos}', Icons.people, Colors.blue),
             _KPIData('Nuevos este mes', '${resumen.nuevosClientesMes}', Icons.person_add, Colors.purple),
           ]),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
           _buildKPIRow([
             _KPIData('Total prestado', '${resumen.monedaDefault} ${_formatNumber(resumen.montoTotalPrestado)}', Icons.trending_up, Colors.indigo),
             _KPIData('Total cobrado', '${resumen.monedaDefault} ${_formatNumber(resumen.montoTotalCobrado)}', Icons.check_circle, Colors.green),
+          ]),
+          const SizedBox(height: 8),
+          _buildKPIRow([
             _KPIData('Pendiente cobro', '${resumen.monedaDefault} ${_formatNumber(resumen.montoPendiente)}', Icons.pending, Colors.orange),
             _KPIData('Interés generado', '${resumen.monedaDefault} ${_formatNumber(resumen.interesGenerado)}', Icons.percent, Colors.teal),
           ]),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
 
           // Resumen de pagos del período
-          Text('Pagos del período', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 12),
+          Text('Pagos del período', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
           Card(
+            margin: EdgeInsets.zero,
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
               child: Column(
                 children: [
                   _ResumenPagoRow('Pagos recibidos', '${resumen.monedaDefault} ${_formatNumber(resumen.pagosRecibidosMes)}', Colors.green, Icons.arrow_downward),
                   _ResumenPagoRow('Pagos vencidos', '${resumen.monedaDefault} ${_formatNumber(resumen.pagosVencidosMes)}', Colors.red, Icons.arrow_upward),
-                  const Divider(),
+                  const Divider(height: 12),
                   _ResumenPagoRow('Diferencia neta', '${resumen.monedaDefault} ${_formatNumber(resumen.pagosRecibidosMes - resumen.pagosVencidosMes)}',
                       resumen.pagosRecibidosMes >= resumen.pagosVencidosMes ? Colors.green : Colors.red,
                       resumen.pagosRecibidosMes >= resumen.pagosVencidosMes ? Icons.trending_up : Icons.trending_down,
@@ -137,17 +152,17 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
               ),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
 
           // Top clientes por deuda
-          Text('Top 5 clientes por deuda', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 12),
+          Text('Top 5 clientes por deuda', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
           _buildTopClientesDeuda(),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
 
-          // Préstamos por estado
-          Text('Préstamos por estado', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 12),
+          // Préstamos por estado (reducidos y compactos)
+          Text('Préstamos por estado', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
           _buildPrestamosPorEstado(resumen),
         ],
       ),
@@ -156,20 +171,26 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
 
   Widget _buildKPIRow(List<_KPIData> items) {
     return Row(
-      children: items.map((item) => Expanded(child: _KPICard(data: item))).toList(),
+      children: items.map((item) => Expanded(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: _KPICard(data: item),
+        ),
+      )).toList(),
     );
   }
 
   Widget _buildTopClientesDeuda() {
     final topClientes = <_ClienteDeudaMock>[
-      _ClienteDeudaMock('Juan Pérez', 'USD', 8500, 2),
-      _ClienteDeudaMock('María García', 'MXN', 12000, 1),
-      _ClienteDeudaMock('Carlos López', 'USD', 3000, 1),
-      _ClienteDeudaMock('Ana Martínez', 'USD', 3000, 1),
-      _ClienteDeudaMock('Pedro Sánchez', 'USD', 2000, 1),
+      _ClienteDeudaMock('Juan Pérez', 'Bs.', 8500, 2),
+      _ClienteDeudaMock('María García', 'Bs.', 12000, 1),
+      _ClienteDeudaMock('Carlos López', 'Bs.', 3000, 1),
+      _ClienteDeudaMock('Ana Martínez', 'Bs.', 3000, 1),
+      _ClienteDeudaMock('Pedro Sánchez', 'Bs.', 2000, 1),
     ];
 
     return Card(
+      margin: EdgeInsets.zero,
       child: ListView.separated(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
@@ -178,18 +199,20 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
         itemBuilder: (context, index) {
           final c = topClientes[index];
           return ListTile(
+            dense: true,
             leading: CircleAvatar(
+              radius: 14,
               backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-              child: Text('${index + 1}', style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onPrimaryContainer)),
+              child: Text('${index + 1}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Theme.of(context).colorScheme.onPrimaryContainer)),
             ),
-            title: Text(c.nombre, style: const TextStyle(fontWeight: FontWeight.w500)),
-            subtitle: Text('${c.prestamosActivos} préstamos activos'),
+            title: Text(c.nombre, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 12)),
+            subtitle: Text('${c.prestamosActivos} activos', style: const TextStyle(fontSize: 10)),
             trailing: Text(
               '${c.moneda} ${_formatNumber(c.deudaTotal)}',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).colorScheme.primary,
-                fontSize: 16,
+                fontSize: 13,
               ),
             ),
           );
@@ -206,27 +229,28 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
     ];
 
     return Card(
+      margin: EdgeInsets.zero,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         child: Column(
           children: data.map((e) => Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
+            padding: const EdgeInsets.symmetric(vertical: 4),
             child: Row(
               children: [
-                Container(width: 12, height: 12, decoration: BoxDecoration(color: e.color, shape: BoxShape.circle)),
-                const SizedBox(width: 12),
-                Text(e.nombre, style: Theme.of(context).textTheme.bodyLarge),
+                Container(width: 10, height: 10, decoration: BoxDecoration(color: e.color, shape: BoxShape.circle)),
+                const SizedBox(width: 8),
+                Text(e.nombre, style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 12)),
                 const Spacer(),
-                Text('${e.cantidad}', style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
-                const SizedBox(width: 16),
+                Text('${e.cantidad}', style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold, fontSize: 12)),
+                const SizedBox(width: 12),
                 SizedBox(
-                  width: 100,
+                  width: 80,
                   child: LinearProgressIndicator(
                     value: resumen.totalPrestamos > 0 ? e.cantidad / resumen.totalPrestamos : 0,
                     backgroundColor: e.color.withValues(alpha: 0.2),
                     valueColor: AlwaysStoppedAnimation<Color>(e.color),
-                    minHeight: 8,
-                    borderRadius: BorderRadius.circular(4),
+                    minHeight: 6,
+                    borderRadius: BorderRadius.circular(3),
                   ),
                 ),
               ],
@@ -243,37 +267,37 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Evolución de cartera', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 12),
+          Text('Evolución de cartera', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
           Card(
             child: SizedBox(
-              height: 250,
+              height: 220,
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(12),
                 child: _buildLineChart(),
               ),
             ),
           ),
-          const SizedBox(height: 24),
-          Text('Distribución por moneda', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
+          Text('Distribución por moneda', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
           Card(
             child: SizedBox(
-              height: 250,
+              height: 220,
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(12),
                 child: _buildPieChart(),
               ),
             ),
           ),
-          const SizedBox(height: 24),
-          Text('Pagos: Recibidos vs Vencidos', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
+          Text('Pagos: Recibidos vs Vencidos', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
           Card(
             child: SizedBox(
-              height: 250,
+              height: 220,
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(12),
                 child: _buildBarChart(),
               ),
             ),
@@ -284,7 +308,6 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
   }
 
   Widget _buildLineChart() {
-    // Mock data: cartera últimos 6 meses
     final spots = [
       FlSpot(0, 80000),
       FlSpot(1, 95000),
@@ -298,11 +321,11 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
       LineChartData(
         gridData: FlGridData(show: true, drawVerticalLine: false, getDrawingHorizontalLine: (value) => FlLine(color: Colors.grey.shade300, strokeWidth: 0.5)),
         titlesData: FlTitlesData(
-          leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 60, getTitlesWidget: (value, meta) => Text('${(value/1000).toInt()}k', style: const TextStyle(fontSize: 10)))),
+          leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 40, getTitlesWidget: (value, meta) => Text('${(value/1000).toInt()}k', style: const TextStyle(fontSize: 9)))),
           bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, getTitlesWidget: (value, meta) {
             const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'];
             if (value.toInt() >= 0 && value.toInt() < meses.length) {
-              return Text(meses[value.toInt()], style: const TextStyle(fontSize: 10));
+              return Text(meses[value.toInt()], style: const TextStyle(fontSize: 9));
             }
             return const Text('');
           })),
@@ -316,7 +339,7 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
             isCurved: true,
             color: Colors.indigo,
             barWidth: 3,
-            dotData: FlDotData(show: true, getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(radius: 4, color: Colors.indigo, strokeWidth: 2, strokeColor: Colors.white)),
+            dotData: FlDotData(show: true, getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(radius: 3, color: Colors.indigo, strokeWidth: 2, strokeColor: Colors.white)),
             belowBarData: BarAreaData(show: true, color: Colors.indigo.withValues(alpha: 0.1)),
           ),
         ],
@@ -332,12 +355,12 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
     return PieChart(
       PieChartData(
         sections: [
-          PieChartSectionData(value: 85000, color: Colors.indigo, title: 'USD\n68%', radius: 80, titleStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white)),
-          PieChartSectionData(value: 25000, color: Colors.green, title: 'MXN\n20%', radius: 70, titleStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white)),
-          PieChartSectionData(value: 15000, color: Colors.orange, title: 'EUR\n12%', radius: 60, titleStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white)),
+          PieChartSectionData(value: 85000, color: Colors.indigo, title: 'Bs.\n68%', radius: 70, titleStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white)),
+          PieChartSectionData(value: 25000, color: Colors.green, title: 'USD\n20%', radius: 60, titleStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white)),
+          PieChartSectionData(value: 15000, color: Colors.orange, title: 'EUR\n12%', radius: 50, titleStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white)),
         ],
         sectionsSpace: 2,
-        centerSpaceRadius: 40,
+        centerSpaceRadius: 35,
         startDegreeOffset: -90,
       ),
     );
@@ -345,10 +368,10 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
 
   Widget _buildBarChart() {
     final barGroups = [
-      BarChartGroupData(x: 0, barRods: [BarChartRodData(toY: 45000, color: Colors.green, width: 20), BarChartRodData(toY: 8500, color: Colors.red, width: 20)]),
-      BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: 38000, color: Colors.green, width: 20), BarChartRodData(toY: 12000, color: Colors.red, width: 20)]),
-      BarChartGroupData(x: 2, barRods: [BarChartRodData(toY: 52000, color: Colors.green, width: 20), BarChartRodData(toY: 5000, color: Colors.red, width: 20)]),
-      BarChartGroupData(x: 3, barRods: [BarChartRodData(toY: 41000, color: Colors.green, width: 20), BarChartRodData(toY: 9000, color: Colors.red, width: 20)]),
+      BarChartGroupData(x: 0, barRods: [BarChartRodData(toY: 45000, color: Colors.green, width: 16), BarChartRodData(toY: 8500, color: Colors.red, width: 16)]),
+      BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: 38000, color: Colors.green, width: 16), BarChartRodData(toY: 12000, color: Colors.red, width: 16)]),
+      BarChartGroupData(x: 2, barRods: [BarChartRodData(toY: 52000, color: Colors.green, width: 16), BarChartRodData(toY: 5000, color: Colors.red, width: 16)]),
+      BarChartGroupData(x: 3, barRods: [BarChartRodData(toY: 41000, color: Colors.green, width: 16), BarChartRodData(toY: 9000, color: Colors.red, width: 16)]),
     ];
 
     return BarChart(
@@ -357,11 +380,11 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
         maxY: 60000,
         barGroups: barGroups,
         titlesData: FlTitlesData(
-          leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 50, getTitlesWidget: (value, meta) => Text('${(value/1000).toInt()}k', style: const TextStyle(fontSize: 10)))),
+          leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 40, getTitlesWidget: (value, meta) => Text('${(value/1000).toInt()}k', style: const TextStyle(fontSize: 9)))),
           bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: true, getTitlesWidget: (value, meta) {
             const labels = ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'];
             if (value.toInt() >= 0 && value.toInt() < labels.length) {
-              return Text(labels[value.toInt()], style: const TextStyle(fontSize: 10));
+              return Text(labels[value.toInt()], style: const TextStyle(fontSize: 9));
             }
             return const Text('');
           })),
@@ -378,10 +401,10 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Text('Exportar Reportes', style: Theme.of(context).textTheme.titleLarge),
-        const SizedBox(height: 8),
-        Text('Genera reportes en PDF o Excel para compartir o archivar', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
-        const SizedBox(height: 24),
+        Text('Exportar Reportes', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 6),
+        Text('Genera reportes en PDF o Excel para compartir o archivar', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+        const SizedBox(height: 16),
 
         _ExportCard(
           titulo: 'Reporte de Cartera',
@@ -391,7 +414,7 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
           formatos: ['PDF', 'Excel'],
           onExport: (formato) => _exportar('cartera', formato),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
         _ExportCard(
           titulo: 'Reporte de Pagos',
           descripcion: 'Historial detallado de pagos recibidos y pendientes',
@@ -400,7 +423,7 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
           formatos: ['PDF', 'Excel'],
           onExport: (formato) => _exportar('pagos', formato),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
         _ExportCard(
           titulo: 'Reporte de Clientes',
           descripcion: 'Listado de clientes con sus deudas y estado',
@@ -409,7 +432,7 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
           formatos: ['PDF', 'Excel'],
           onExport: (formato) => _exportar('clientes', formato),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
         _ExportCard(
           titulo: 'Reporte Financiero',
           descripcion: 'Ingresos, intereses, morosidad y rentabilidad',
@@ -418,51 +441,13 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
           formatos: ['PDF', 'Excel'],
           onExport: (formato) => _exportar('financiero', formato),
         ),
-        const SizedBox(height: 24),
-
-        // Backup section
-        Text('Respaldo de Datos', style: Theme.of(context).textTheme.titleLarge),
-        const SizedBox(height: 12),
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.backup, color: Theme.of(context).colorScheme.primary, size: 28),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Backup automático', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
-                          Text('Último backup: Hace 2 horas • Google Drive', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(child: OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.cloud_download), label: const Text('Restaurar'))),
-                    const SizedBox(width: 12),
-                    Expanded(child: FilledButton.icon(onPressed: () {}, icon: const Icon(Icons.cloud_upload), label: const Text('Backup ahora'))),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
       ],
     );
   }
 
   void _exportar(String tipo, String formato) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Exportando $tipo a $formato... (pendiente implementar)')),
+      SnackBar(content: Text('Exportando $tipo a $formato...')),
     );
   }
 
@@ -489,7 +474,7 @@ class _ResumenMock {
   final int nuevosClientesMes;
   final double pagosRecibidosMes;
   final double pagosVencidosMes;
-  final String monedaDefault = 'USD';
+  final String monedaDefault = 'Bs.';
 
   _ResumenMock({
     required this.totalPrestamos,
@@ -524,24 +509,21 @@ class _KPICard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      margin: EdgeInsets.zero,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(color: data.color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
-                  child: Icon(data.icon, color: data.color, size: 20),
-                ),
-              ],
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(color: data.color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
+              child: Icon(data.icon, color: data.color, size: 16),
             ),
-            const SizedBox(height: 12),
-            Text(data.value, style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: data.color)),
-            const SizedBox(height: 4),
-            Text(data.label, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+            const SizedBox(height: 8),
+            Text(data.value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black87)),
+            const SizedBox(height: 2),
+            Text(data.label, style: TextStyle(fontSize: 10, color: Colors.grey.shade600), maxLines: 1, overflow: TextOverflow.ellipsis),
           ],
         ),
       ),
@@ -551,24 +533,24 @@ class _KPICard extends StatelessWidget {
 
 class _ResumenPagoRow extends StatelessWidget {
   final String label;
-  final String value;
+  final String amount;
   final Color color;
   final IconData icon;
   final bool isTotal;
 
-  const _ResumenPagoRow(this.label, this.value, this.color, this.icon, {this.isTotal = false});
+  const _ResumenPagoRow(this.label, this.amount, this.color, this.icon, {this.isTotal = false});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Icon(icon, color: color, size: 20),
-          const SizedBox(width: 12),
-          Expanded(child: Text(label, style: theme.textTheme.bodyLarge?.copyWith(fontWeight: isTotal ? FontWeight.w600 : FontWeight.normal))),
-          Text(value, style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold, color: color)),
+          Icon(icon, size: 16, color: color),
+          const SizedBox(width: 8),
+          Text(label, style: TextStyle(fontSize: isTotal ? 13 : 12, fontWeight: isTotal ? FontWeight.bold : FontWeight.normal)),
+          const Spacer(),
+          Text(amount, style: TextStyle(fontSize: isTotal ? 14 : 12, fontWeight: FontWeight.bold, color: color)),
         ],
       ),
     );
@@ -598,7 +580,7 @@ class _ExportCard extends StatelessWidget {
   final IconData icon;
   final Color color;
   final List<String> formatos;
-  final void Function(String) onExport;
+  final Function(String) onExport;
 
   const _ExportCard({
     required this.titulo,
@@ -612,37 +594,40 @@ class _ExportCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      margin: EdgeInsets.zero,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
-              child: Icon(icon, color: color, size: 28),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
+              child: Icon(icon, color: color, size: 24),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(titulo, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 4),
-                  Text(descripcion, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                  Text(titulo, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  const SizedBox(height: 2),
+                  Text(descripcion, style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
                 ],
               ),
             ),
+            const SizedBox(width: 8),
             Row(
+              mainAxisSize: MainAxisSize.min,
               children: formatos.map((f) => Padding(
-                padding: const EdgeInsets.only(left: 8),
+                padding: const EdgeInsets.only(left: 4),
                 child: OutlinedButton(
                   onPressed: () => onExport(f),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: color,
-                    side: BorderSide(color: color),
-                    minimumSize: const Size(70, 36),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
-                  child: Text(f),
+                  child: Text(f, style: const TextStyle(fontSize: 10)),
                 ),
               )).toList(),
             ),

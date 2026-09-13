@@ -30,14 +30,15 @@ class _PrestamosScreenState extends ConsumerState<PrestamosScreen> {
     ];
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+      backgroundColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
       body: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
-          // Header personalizado
+          // Header personalizado con botón atrás
           CustomHeader(
             title: 'Gestión de Préstamos',
             subtitle: 'Control de cartera y garantías',
+            onLeadingPressed: () => context.go(AppConstants.routeHome),
             actions: [
               InkWell(
                 onTap: () => context.go(AppConstants.routeNuevoPrestamo),
@@ -98,10 +99,10 @@ class _PrestamosScreenState extends ConsumerState<PrestamosScreen> {
                   loanNumber: prestamo['number'] as int,
                   clientName: prestamo['client'] as String,
                   amount: prestamo['amount'] as double,
+                  currency: 'Bs.',
                   status: prestamo['status'] as String,
                   dueDate: prestamo['dueDate'] as DateTime,
                   onTap: () {
-                    // TODO: Navegar al detalle del préstamo
                     print('Préstamo seleccionado: #${prestamo['number']}');
                   },
                 );

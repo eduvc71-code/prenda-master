@@ -37,27 +37,34 @@ class _ClientesScreenState extends ConsumerState<ClientesScreen> {
     ];
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+      backgroundColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
       body: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
-          // Header personalizado
+          // Header personalizado con flecha atrás funcional
           CustomHeader(
-            title: 'Directorio de Clientes',
+            title: 'Clientes',
             subtitle: 'Gestión de clientes y contactos',
+            onLeadingPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go(AppConstants.routeHome);
+              }
+            },
             actions: [
               InkWell(
                 onTap: () => context.go(AppConstants.routeNuevoCliente),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(6),
                 child: Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(6),
                   ),
                   child: Icon(
                     Icons.person_add_rounded,
-                    size: 24,
+                    size: 18,
                     color: theme.colorScheme.onPrimaryContainer,
                   ),
                 ),
@@ -72,7 +79,7 @@ class _ClientesScreenState extends ConsumerState<ClientesScreen> {
               shape: BoxShape.rectangle,
             ),
             child: Padding(
-              padding: const EdgeInsetsDirectional.fromSTEB(24, 0, 24, 16),
+              padding: const EdgeInsetsDirectional.fromSTEB(16, 0, 16, 10),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -85,7 +92,7 @@ class _ClientesScreenState extends ConsumerState<ClientesScreen> {
                       prefixIcon: Icon(
                         Icons.search_rounded,
                         color: theme.colorScheme.onSurfaceVariant,
-                        size: 24,
+                        size: 18,
                       ),
                       filled: true,
                       fillColor: theme.colorScheme.surfaceContainerHighest,
@@ -94,15 +101,15 @@ class _ClientesScreenState extends ConsumerState<ClientesScreen> {
                         borderSide: BorderSide.none,
                       ),
                       contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 16,
+                        horizontal: 14,
+                        vertical: 10,
                       ),
                     ),
                   ),
                   const SizedBox(height: 16),
                   // Filtros
                   FilterChipGroup(
-                    options: ['Todos', 'Activos', 'Inactivos', 'Morosos'],
+                    options: const ['Todos', 'Activos', 'Inactivos', 'Morosos'],
                     selectedOption: _selectedFilter,
                     onSelected: (option) {
                       setState(() {
@@ -118,20 +125,19 @@ class _ClientesScreenState extends ConsumerState<ClientesScreen> {
           // Lista de clientes
           Expanded(
             child: ListView.separated(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(16),
               itemCount: clientesMock.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
-                final cliente = clientesMock[index];
+                final client = clientesMock[index];
                 return ClientCard(
-                  name: cliente['name'] as String,
-                  phone: cliente['phone'] as String,
-                  email: cliente['email'] as String?,
-                  activeLoans: cliente['loans'] as int,
-                  totalDebt: cliente['debt'] as double,
+                  name: client['name'] as String,
+                  phone: client['phone'] as String,
+                  email: client['email'] as String,
+                  activeLoans: client['loans'] as int,
+                  totalDebt: client['debt'] as double,
                   onTap: () {
-                    // TODO: Navegar al detalle del cliente
-                    print('Cliente seleccionado: ${cliente['name']}');
+                    // Acción al tocar cliente
                   },
                 );
               },

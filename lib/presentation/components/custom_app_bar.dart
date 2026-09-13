@@ -17,7 +17,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   });
 
   @override
-  Size get preferredSize => const Size.fromHeight(subtitle != null ? 90 : 70);
+  Size get preferredSize => Size.fromHeight(subtitle != null ? 90 : 70);
 
   @override
   Widget build(BuildContext context) {

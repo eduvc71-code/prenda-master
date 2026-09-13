@@ -34,6 +34,16 @@ class _PagoScreenState extends ConsumerState<PagoScreen> with SingleTickerProvid
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pagos'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go(AppConstants.routeHome);
+            }
+          },
+        ),
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
