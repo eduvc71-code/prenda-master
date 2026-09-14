@@ -1,9 +1,5 @@
-import 'dart:io';
 import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p;
-import 'package:prenda_master/core/constants/app_constants.dart';
+import 'connection/database_connection.dart' as conn;
 part 'app_database.g.dart';
 
 // Part 1: Define the database tables
@@ -56,7 +52,7 @@ class Pagos extends Table {
 
 @DriftDatabase(tables: [Clientes, Prendas, Prestamos, Pagos])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(_openConnection());
+  AppDatabase() : super(conn.openConnection());
 
   @override
   int get schemaVersion => 1;
@@ -255,13 +251,4 @@ class AppDatabase extends _$AppDatabase {
       await delete(clientes).go();
     });
   }
-}
-
-// Part 3: Open the database (native for mobile, lazy)
-LazyDatabase _openConnection() {
-  return LazyDatabase(() async {
-    final dbFolder = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dbFolder.path, '${AppConstants.dbName}'));
-    return NativeDatabase.createInBackground(file);
-  });
 }
