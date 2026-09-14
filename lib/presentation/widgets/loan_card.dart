@@ -21,6 +21,11 @@ class LoanCard extends StatelessWidget {
     this.onTap,
   });
 
+  String get _displayCurrency {
+    if (currency.toUpperCase().contains('BOLIVIANO')) return 'Bs.';
+    return currency;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -166,7 +171,7 @@ class LoanCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Monto: $currency ${amount.toStringAsFixed(2)}',
+                    'Monto: $_displayCurrency ${amount.toStringAsFixed(2)}',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: theme.colorScheme.primary,

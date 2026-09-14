@@ -113,7 +113,13 @@ class _NuevoClienteScreenState extends ConsumerState<NuevoClienteScreen> {
           );
 
           if (isFront) {
-            Future.delayed(const Duration(milliseconds: 400), () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('AHORA SUBA EL REVERSO DEL C.I.'),
+                duration: Duration(seconds: 2),
+              ),
+            );
+            Future.delayed(const Duration(seconds: 2), () {
               if (mounted) _captureIdCard(false);
             });
           }
@@ -180,7 +186,13 @@ class _NuevoClienteScreenState extends ConsumerState<NuevoClienteScreen> {
           );
 
           if (isFront) {
-            Future.delayed(const Duration(milliseconds: 400), () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('AHORA SUBA EL REVERSO DEL C.I.'),
+                duration: Duration(seconds: 2),
+              ),
+            );
+            Future.delayed(const Duration(seconds: 2), () {
               if (mounted) _processGallery(false);
             });
           }
@@ -213,10 +225,16 @@ class _NuevoClienteScreenState extends ConsumerState<NuevoClienteScreen> {
       if (apellidosIdx != -1) {
         for (int i = apellidosIdx + 1; i < lines.length; i++) {
           String c = lines[i];
+          if (c.toUpperCase().startsWith('NOMBRES:')) c = c.substring(8).trim();
+          if (c.toUpperCase().startsWith('NOMBRES')) c = c.substring(7).trim();
+          if (c.startsWith(':')) c = c.substring(1).trim();
           if (!_isHeaderOrNoise(c) && !RegExp(r'^[0-9]+$').hasMatch(c) && c.length > 1) {
             _nombreController.text = c;
             if (i + 1 < lines.length) {
               String cLast = lines[i + 1];
+              if (cLast.toUpperCase().startsWith('APELLIDOS:')) cLast = cLast.substring(10).trim();
+              if (cLast.toUpperCase().startsWith('APELLIDOS')) cLast = cLast.substring(9).trim();
+              if (cLast.startsWith(':')) cLast = cLast.substring(1).trim();
               if (!_isHeaderOrNoise(cLast) && !RegExp(r'^[0-9]+$').hasMatch(cLast) && cLast.length > 1) {
                 _apellidoController.text = cLast;
               }
@@ -250,10 +268,10 @@ class _NuevoClienteScreenState extends ConsumerState<NuevoClienteScreen> {
             c = c.substring(c.indexOf(':') + 1).trim();
           }
           final u = c.toUpperCase();
-          if (u.contains('OCUPACI') || u.contains('GOMERCIANTE') || u.contains('ESTADO') || u.contains('SOLTERO') || u.contains('CASADO') || u.contains('BOL') || u.contains('PATRO') || u.contains('PULGAR') || u.contains('ECTHRA') || u.contains('AECUT')) {
+          if (u.contains('OCUPACI') || u.contains('OCUPACION') || u.contains('GOMERCIANTE') || u.contains('ESTADO') || u.contains('SOLTERO') || u.contains('CASADO') || u.contains('BOL') || u.contains('PATRO') || u.contains('PULGAR') || u.contains('ECTHRA') || u.contains('AECUT')) {
             break;
           }
-          if (!_isHeaderOrNoise(c) && c.length > 2 && !u.contains('OCUPACI') && !u.contains('GOMERCIANTE')) {
+          if (!_isHeaderOrNoise(c) && c.length > 2 && !u.contains('OCUPACI') && !u.contains('OCUPACION') && !u.contains('GOMERCIANTE')) {
             addressParts.add(c);
           }
         }
@@ -273,7 +291,7 @@ class _NuevoClienteScreenState extends ConsumerState<NuevoClienteScreen> {
            u.contains('ESTADO') || u.contains('BOLIVIA') || u.contains('IDENTIFICACION') ||
            u.contains('NACIMIENTO') || u.contains('FIRMA') || u.contains('REPUBLICA') ||
            u.contains('ESTUDIANTE') || u.contains('SANGUINEO') || u.contains('DIRECTORA') ||
-           u.contains('OCUPACI') || u.contains('GOMERCIANTE') ||
+           u.contains('OCUPACI') || u.contains('OCUPACION') || u.contains('GOMERCIANTE') ||
            u == 'NOMBRE' || u == 'NOMBRES' || u == 'APELLIDO' || u == 'APELLIDOS' || u == 'DOMICILIO' || u.contains('NOMBRES:') || u.contains('APELLIDOS:');
   }
 
@@ -298,7 +316,7 @@ class _NuevoClienteScreenState extends ConsumerState<NuevoClienteScreen> {
       if (context.canPop()) {
         context.pop();
       } else {
-        context.go(AppConstants.routeHome);
+        context.go(AppConstants.routeClientes);
       }
     } catch (e) {
       if (!mounted) return;
@@ -343,7 +361,7 @@ class _NuevoClienteScreenState extends ConsumerState<NuevoClienteScreen> {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          // Sección: Carnet OCR (Ultra compacto)
+                          // Sección: Carnet OCR (Compacto)
                           Container(
                             decoration: BoxDecoration(
                               color: theme.colorScheme.surface,
@@ -680,10 +698,10 @@ class _GalleryOcrValidationScreenState extends State<GalleryOcrValidationScreen>
             c = _cleanValue(c, 'DOHCO.');
             
             final u = c.toUpperCase();
-            if (u.contains('OCUPACI') || u.contains('GOMERCIANTE') || u.contains('ESTADO') || u.contains('SOLTERO') || u.contains('CASADO') || u.contains('BOL') || u.contains('PATRO') || u.contains('PULGAR') || u.contains('ECTHRA') || u.contains('AECUT')) {
+            if (u.contains('OCUPACI') || u.contains('OCUPACION') || u.contains('GOMERCIANTE') || u.contains('ESTADO') || u.contains('SOLTERO') || u.contains('CASADO') || u.contains('BOL') || u.contains('PATRO') || u.contains('PULGAR') || u.contains('ECTHRA') || u.contains('AECUT')) {
               break;
             }
-            if (!_isHeaderOrNoise(c) && c.length > 2 && !u.contains('OCUPACI') && !u.contains('GOMERCIANTE')) {
+            if (!_isHeaderOrNoise(c) && c.length > 2 && !u.contains('OCUPACI') && !u.contains('OCUPACION') && !u.contains('GOMERCIANTE')) {
               addressParts.add(c);
             }
           }
@@ -713,7 +731,7 @@ class _GalleryOcrValidationScreenState extends State<GalleryOcrValidationScreen>
            u.contains('ESTADO') || u.contains('BOLIVIA') || u.contains('IDENTIFICACION') ||
            u.contains('NACIMIENTO') || u.contains('FIRMA') || u.contains('REPUBLICA') ||
            u.contains('ESTUDIANTE') || u.contains('SANGUINEO') || u.contains('DIRECTORA') ||
-           u.contains('OCUPACI') || u.contains('GOMERCIANTE') ||
+           u.contains('OCUPACI') || u.contains('OCUPACION') || u.contains('GOMERCIANTE') ||
            u == 'NOMBRE' || u == 'NOMBRES' || u == 'APELLIDO' || u == 'APELLIDOS' || u == 'DOMICILIO' || u.contains('NOMBRES:') || u.contains('APELLIDOS:');
   }
 
