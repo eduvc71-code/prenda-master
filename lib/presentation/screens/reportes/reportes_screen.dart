@@ -132,7 +132,7 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Indicadores Clave (Datos Reales)', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+          Text('Indicadores Clave', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           _buildKPIRow([
             _KPIData('Préstamos activos', '$prestamosActivos', Icons.account_balance_wallet, Colors.green),
@@ -307,7 +307,7 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Evolución de cartera (Real)', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+          Text('Evolución de cartera', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           Card(
             child: SizedBox(
@@ -447,7 +447,7 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Text('Exportar Reportes Reales', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        Text('Exportar Reportes', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
         const SizedBox(height: 6),
         Text('Genera reportes actualizados con los registros de la base de datos', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
         const SizedBox(height: 16),
@@ -484,7 +484,7 @@ class _ReportesScreenState extends ConsumerState<ReportesScreen> with SingleTick
 
   void _exportar(String tipo, String formato) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Exportando $tipo a $formato con datos reales de BD...')),
+      SnackBar(content: Text('Exportando $tipo a $formato datos...')),
     );
   }
 
